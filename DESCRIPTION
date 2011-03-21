@@ -1,0 +1,11 @@
+Package: maxlike
+Type: Package
+Title: Fits models of the probability of occurrence to presence-only data.
+Version: 0.0-1
+Date: 2011-03-21
+Depends: raster
+Author: Who wrote it
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+LazyLoad: yes
