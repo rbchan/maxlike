@@ -1,7 +1,15 @@
 maxlike <- function(formula, raster, points, starts) {
 
-    x <- as.data.frame(extract(raster, points))
-    z <- as.data.frame(getValues(raster))
+    npts <- nrow(points)
+    npix <- prod(dim(raster)[1:2])
+    varnames <- all.vars(formula)
+    layernames <- layerNames(raster)
+    if(!all(varnames %in% layernames))
+        stop("names in formula are not in layerNames(raster).")
+
+    x <- as.data.frame(matrix(extract(raster, points), npts))
+    z <- as.data.frame(matrix(getValues(raster), npix))
+    names(x) <- names(z) <- layernames
     X <- model.matrix(formula, x)
     Z <- model.matrix(formula, z)
 
@@ -14,8 +22,8 @@ maxlike <- function(formula, raster, points, starts) {
        names(starts) <- colnames(X)
 
     nll <- function(pars) {
-        psix <- plogis(X %*% pars) # observed locations
-        psiz <- plogis(Z %*% pars) # all locations
+        psix <- plogis(X %*% pars)
+        psiz <- plogis(Z %*% pars)
         -1*sum(log(psix/sum(psiz)))
         }
 

@@ -55,6 +55,7 @@
 \seealso{ \code{\link{maxlike-package}} }
 
 \examples{
+
 data(MaungaWhau)
 
 elev <- MaungaWhau$elev
