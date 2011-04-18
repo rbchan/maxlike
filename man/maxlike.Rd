@@ -5,15 +5,16 @@
 }
 \description{
   Estimating the probability of occurrence from presence-only data
-  (ie, no observed absences) requires data from a random sample of
-  presence points, and data from the entire region of interest.
+  (ie, no observed absences) requires covariate data from a random
+  sample of presence points, and covariate data from the entire
+  region of interest.
 }
 \usage{
   maxlike(formula, raster, points, starts)
 }
 \arguments{
   \item{formula}{
-     A right-hand side formula describing model
+     A right-hand side formula describing the model
 }
   \item{raster}{
     A `raster stack' object created by the \code{\link{stack}} function
@@ -52,7 +53,7 @@
 %% ~put references to the literature/web site here ~
 }
 
-\seealso{ \code{\link{maxlike-package}} }
+\seealso{ \code{\link{maxlike-package}}, \code{\link{raster}} }
 
 \examples{
 
@@ -63,12 +64,10 @@ precip <- MaungaWhau$precip
 xy <- MaungaWhau$xy
 
 # Elevation, standardized
-elev <- raster(elev, 1, 87, 1, 61)
 plot(elev)
 points(xy)
 
 # Precipitation, standardized
-precip <- raster(precip, 1, 87, 1, 61)
 plot(precip)
 points(xy)
 

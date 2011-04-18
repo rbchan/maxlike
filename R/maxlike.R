@@ -1,5 +1,7 @@
 maxlike <- function(formula, raster, points, starts) {
 
+    call <- match.call()
+
     npts <- nrow(points)
     npix <- prod(dim(raster)[1:2])
     varnames <- all.vars(formula)
@@ -29,9 +31,30 @@ maxlike <- function(formula, raster, points, starts) {
 
     fm <- optim(starts, nll, hessian=TRUE)
     par <- fm$par
-    vc <- solve(fm$hessian)
-    se <- sqrt(diag(vc))
+    vc <- try(solve(fm$hessian))
+    if(identical(class(vc), "matrix"))
+        se <- sqrt(diag(vc))
+    else {
+        vc <- matrix(NA, npars, npars)
+        se <- rep(NA, npars)
+        }
     aic <- 2*fm$value + 2*npars
-    return(list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic))
+    out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call)
+    class(out) <- c("maxlikeFit", "list")
+    return(out)
     }
+
+
+print.maxlikeFit <- function(fm, ...) {
+    cat("\nCall:", paste(deparse(fm$call)), "\n\n")
+    cat("Coefficients:\n")
+    print(fm$Est, ...)
+    cat("\nAIC:", fm$AIC, "\n\n")
+    }
+
+coef.maxlikeFit <- function(fm) fm$Est[,"Est"]
+
+
+vcov.maxlikeFit <- function(fm) fm$vcov
+
 
