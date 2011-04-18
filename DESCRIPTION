@@ -1,11 +1,11 @@
 Package: maxlike
 Type: Package
-Title: Fits models of the probability of occurrence to presence-only data.
+Title: Estimate probability of occurrence using presence-only data.
 Version: 0.0-1
-Date: 2011-03-21
+Date: 2011-04-15
 Depends: raster
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Richard Chandler and Andy Royle
+Maintainer: Richard Chandler <rchandler@usgs.gov>
+Description: Estimate probability of occurrence using presence-only data.
+License: GPL (>=3)
 LazyLoad: yes

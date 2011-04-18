@@ -4,10 +4,10 @@
   Estimate probability of occurrence from presence-only data
 }
 \description{
-  Estimating the probability of occurrence from presence-only data
-  (ie, no observed absences) requires covariate data from a random
-  sample of presence points, and covariate data from the entire
-  region of interest.
+  Estimate the probability of occurrence from presence-only data
+  (ie, no observed absences) using covariate data
+  from a random sample of presence points, and covariate data from
+  the entire region of interest.
 }
 \usage{
   maxlike(formula, raster, points, starts)
@@ -30,7 +30,8 @@
 \details{
   Data from the entire region of interest are contained in the stack of
   rasters. Data from the presence locations are extracted using the
-  coordinates in \code{points}.
+  coordinates in \code{points}. These should both use the same
+  coordinate system.
 }
 \value{
   A list with 3 components
@@ -38,7 +39,6 @@
     standard errors (SE).}
   \item{vcov}{variance-covariance matrix}
   \item{AIC}{AIC}
-
 }
 \note{
   In general it is very hard to obtain a random sample of presence
@@ -48,10 +48,6 @@
   presence-only models.
 }
 
-
-\references{
-%% ~put references to the literature/web site here ~
-}
 
 \seealso{ \code{\link{maxlike-package}}, \code{\link{raster}} }
 
@@ -80,7 +76,8 @@ fm <- maxlike(~elev + I(elev^2) + precip, ep, xy)
 fm
 
 # Expected probability of occurrence
-E.logitpsi <- -0.96 + 1.2*elev + -2.0*(elev^2) + 1.1*precip
+beta <- coef(fm)
+E.logitpsi <- beta[1] + beta[2]*elev + beta[3]*(elev^2) + beta[4]*precip
 E.psi <- exp(E.logitpsi)/(1+exp(E.logitpsi))
 plot(E.psi)
 points(xy)

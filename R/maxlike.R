@@ -1,5 +1,7 @@
 maxlike <- function(formula, raster, points, starts) {
 
+    if(identical(formula, ~1))
+        stop("At least one predictor variable must be specified in the formula")
     call <- match.call()
 
     npts <- nrow(points)
@@ -7,7 +9,7 @@ maxlike <- function(formula, raster, points, starts) {
     varnames <- all.vars(formula)
     layernames <- layerNames(raster)
     if(!all(varnames %in% layernames))
-        stop("names in formula are not in layerNames(raster).")
+        stop("at least 1 variable in the formula is not in layerNames(raster).")
 
     x <- as.data.frame(matrix(extract(raster, points), npts))
     z <- as.data.frame(matrix(getValues(raster), npix))
@@ -51,6 +53,8 @@ print.maxlikeFit <- function(fm, ...) {
     print(fm$Est, ...)
     cat("\nAIC:", fm$AIC, "\n\n")
     }
+
+
 
 coef.maxlikeFit <- function(fm) fm$Est[,"Est"]
 
