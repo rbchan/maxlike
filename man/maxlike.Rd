@@ -53,10 +53,11 @@
 
 \examples{
 
-data(MaungaWhau)
+# Fake data based on R's volcano dataset
 
-elev <- MaungaWhau$elev
-precip <- MaungaWhau$precip
+data(MaungaWhau)
+elev <- raster(MaungaWhau$elev, 0, 61, 0, 87)
+precip <- raster(MaungaWhau$precip, 0, 61, 0, 87)
 xy <- MaungaWhau$xy
 
 # Elevation, standardized
@@ -81,6 +82,40 @@ E.logitpsi <- beta[1] + beta[2]*elev + beta[3]*(elev^2) + beta[4]*precip
 E.psi <- exp(E.logitpsi)/(1+exp(E.logitpsi))
 plot(E.psi)
 points(xy)
+
+
+
+# Simulation example
+
+x1 <- sort(rnorm(100))
+x1 <- raster(outer(x1, x1), xmn=0, xmx=100, ymn=0, ymx=100)
+
+x2 <- raster(matrix(runif(1e4), 100, 100), 0, 100, 0, 100)
+
+logit.psi <- -1 + 1*x1 + 0*x2
+psi <- exp(logit.psi)/(1+exp(logit.psi))
+plot(psi)
+
+r <- stack(x1, x2)
+r@layernames <- c("x1", "x2")
+plot(r)
+
+set.seed(131)
+pa <- matrix(NA, 100, 100)
+pa[] <- rbinom(1e4, 1, as.matrix(psi))
+str(pa)
+table(pa)
+
+pa <- raster(pa, 0, 100, 0, 100)
+plot(pa)
+
+xy <- xyFromCell(pa, sample(Which(pa==1, cells=TRUE), 1000))
+
+plot(x1)
+points(xy)
+
+maxlike(~x1 + x2, raster=r, points=xy)
+maxlike(~x1, r, xy)
 
 }
 

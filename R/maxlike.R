@@ -47,18 +47,18 @@ maxlike <- function(formula, raster, points, starts) {
     }
 
 
-print.maxlikeFit <- function(fm, ...) {
-    cat("\nCall:", paste(deparse(fm$call)), "\n\n")
+print.maxlikeFit <- function(x, ...) {
+    cat("\nCall:", paste(deparse(x$call)), "\n\n")
     cat("Coefficients:\n")
-    print(fm$Est, ...)
-    cat("\nAIC:", fm$AIC, "\n\n")
+    print(x$Est, ...)
+    cat("\nAIC:", x$AIC, "\n\n")
     }
 
 
 
-coef.maxlikeFit <- function(fm) fm$Est[,"Est"]
+coef.maxlikeFit <- function(object, ...) object$Est[,"Est"]
 
 
-vcov.maxlikeFit <- function(fm) fm$vcov
+vcov.maxlikeFit <- function(object, ...) object$vcov
 
 
