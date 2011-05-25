@@ -1,4 +1,4 @@
-maxlike <- function(formula, raster, points, starts) {
+maxlike <- function(formula, raster, points, starts, hessian=TRUE, ...) {
 
     if(identical(formula, ~1))
         stop("At least one predictor variable must be specified in the formula")
@@ -11,7 +11,13 @@ maxlike <- function(formula, raster, points, starts) {
     if(!all(varnames %in% layernames))
         stop("at least 1 variable in the formula is not in layerNames(raster).")
 
-    x <- as.data.frame(matrix(extract(raster, points), npts))
+    cellID <- cellFromXY(raster, points)
+    duplicates <- duplicated(cellID)
+    uniqueCells <- unique(cellID)
+    nptsU <- length(uniqueCells)
+    if(nptsU < npts)
+        warning(paste("Some cells contain multiple points. \n\tDuplicate points have been discarded.", nptsU, "points were retained"))
+    x <- as.data.frame(matrix(extract(raster, uniqueCells), nptsU))
     z <- as.data.frame(matrix(getValues(raster), npix))
     names(x) <- names(z) <- layernames
     X <- model.matrix(formula, x)
@@ -31,7 +37,7 @@ maxlike <- function(formula, raster, points, starts) {
         -1*sum(log(psix/sum(psiz)))
         }
 
-    fm <- optim(starts, nll, hessian=TRUE)
+    fm <- optim(starts, nll, hessian=hessian, ...)
     par <- fm$par
     vc <- try(solve(fm$hessian))
     if(identical(class(vc), "matrix"))
@@ -41,11 +47,16 @@ maxlike <- function(formula, raster, points, starts) {
         se <- rep(NA, npars)
         }
     aic <- 2*fm$value + 2*npars
-    out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call)
+    out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call,
+                retained=points[!duplicates,])
     class(out) <- c("maxlikeFit", "list")
     return(out)
     }
 
+
+
+
+# S3 methods
 
 print.maxlikeFit <- function(x, ...) {
     cat("\nCall:", paste(deparse(x$call)), "\n\n")
@@ -60,5 +71,19 @@ coef.maxlikeFit <- function(object, ...) object$Est[,"Est"]
 
 
 vcov.maxlikeFit <- function(object, ...) object$vcov
+
+
+
+predict.maxlikeFit <- function(object, newdata, ...) {
+    form <- as.formula(object$call$formula)
+    if(missing(newdata))
+        stop("newdata must be supplied")
+    if(!identical(class(newdata)[1], "data.frame"))
+        stop("newdata must be a data.frame")
+    X <- model.matrix(form, newdata)
+    E <- drop(plogis(X %*% coef(object)))
+    return(E)
+    }
+
 
 
