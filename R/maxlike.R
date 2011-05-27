@@ -1,35 +1,74 @@
-maxlike <- function(formula, raster, points, starts, hessian=TRUE, ...) {
-
+maxlike <- function(formula, covData, ptData, removeDuplicates=FALSE,
+                    starts, hessian=TRUE, na.action="na.omit", ...)
+{
     if(identical(formula, ~1))
-        stop("At least one predictor variable must be specified in the formula")
-    call <- match.call()
-
-    npts <- nrow(points)
-    npix <- prod(dim(raster)[1:2])
+        stop("At least one covariate must be specified in the formula")
     varnames <- all.vars(formula)
-    layernames <- layerNames(raster)
-    if(!all(varnames %in% layernames))
-        stop("at least 1 variable in the formula is not in layerNames(raster).")
-
-    cellID <- cellFromXY(raster, points)
-    duplicates <- duplicated(cellID)
-    uniqueCells <- unique(cellID)
-    nptsU <- length(uniqueCells)
-    if(nptsU < npts)
-        warning(paste("Some cells contain multiple points. \n\tDuplicate points have been discarded.", nptsU, "points were retained"))
-    x <- as.data.frame(matrix(extract(raster, uniqueCells), nptsU))
-    z <- as.data.frame(matrix(getValues(raster), npix))
-    names(x) <- names(z) <- layernames
-    X <- model.matrix(formula, x)
-    Z <- model.matrix(formula, z)
-
+    call <- match.call()
+    npts <- nrow(ptData)
+    cd.class <- class(covData)[1]
+    if(!cd.class %in% c("RasterStack", "data.frame"))
+        stop("covData must be a raster stack or a data.frame")
+    pt.class <- class(ptData)[1]
+    if(!pt.class %in% c("matrix", "data.frame"))
+        stop("ptData must be a matrix or a data.frame")
+    pt.names <- colnames(ptData)
+    if(identical(cd.class, "data.frame")) {
+        cd.names <- colnames(covData)
+        npix <- nrow(covData)
+        if(!all(cd.names %in% pt.names))
+            stop("When covData is a data.frame, ptData must be a data.frame with the same column names")
+        if(removeDuplicates)
+            warning("removeDuplicates ignored when covData is a data.frame")
+        duplicates <- rep(FALSE, npts)
+        x <- ptData
+        z <- covData
+        }
+    if(identical(cd.class, "RasterStack")) {
+        cd.names <- layerNames(covData)
+        npix <- prod(dim(covData)[1:2])
+        cellID <- cellFromXY(covData, ptData)
+        duplicates <- duplicated(cellID)
+        if(removeDuplicates) {
+            cellID <- unique(cellID)
+            npts <- length(cellID)
+            }
+        x <- as.data.frame(matrix(extract(covData, cellID), npts))
+        z <- as.data.frame(matrix(getValues(covData), npix))
+        names(x) <- names(z) <- cd.names
+        }
+    if(!all(varnames %in% cd.names))
+        stop("at least 1 covariate in the formula is not in covData.")
+    X.mf <- model.frame(formula, x, na.action=na.action)
+    X.mf.a <- attributes(X.mf)
+    pts.removed <- integer(0)
+    if("na.action" %in% names(X.mf.a)) {
+        pts.removed <- X.mf.a$na.action
+        npts.removed <- length(pts.removed)
+        if(npts.removed > 0)
+            warning(paste(npts.removed, "points removed due to missing values"))
+        }
+    X <- model.matrix(formula, X.mf)
+    Z.mf <- model.frame(formula, z, na.action=na.action)
+    Z.mf.a <- attributes(Z.mf)
+    pix.removed <- integer(0)
+    if("na.action" %in% names(Z.mf.a)) {
+        pix.removed <- Z.mf.a$na.action
+        npix.removed <- length(pix.removed)
+        if(npix.removed > 0)
+            warning(paste(npix.removed, "pixels removed due to missing values"))
+        }
+    Z <- model.matrix(formula, Z.mf)
     npars <- ncol(X)
+    parnames <- colnames(X)
+    if(!"(Intercept)" %in% parnames)
+        stop("The intercept must be estimated")
     if(missing(starts)) {
         starts <- rep(0, npars)
-        names(starts) <- colnames(X)
+        names(starts) <- parnames
         }
     else
-       names(starts) <- colnames(X)
+       names(starts) <- parnames
 
     nll <- function(pars) {
         psix <- plogis(X %*% pars)
@@ -39,16 +78,19 @@ maxlike <- function(formula, raster, points, starts, hessian=TRUE, ...) {
 
     fm <- optim(starts, nll, hessian=hessian, ...)
     par <- fm$par
-    vc <- try(solve(fm$hessian))
-    if(identical(class(vc), "matrix"))
-        se <- sqrt(diag(vc))
+    if(hessian) {
+        vc <- try(solve(fm$hessian))
+        if(identical(class(vc), "matrix"))
+           se <- sqrt(diag(vc))
+        }
     else {
         vc <- matrix(NA, npars, npars)
         se <- rep(NA, npars)
         }
     aic <- 2*fm$value + 2*npars
     out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call,
-                retained=points[!duplicates,])
+                retained=ptData[!duplicates,], pts.removed=pts.removed,
+                pix.removed=pix.removed)
     class(out) <- c("maxlikeFit", "list")
     return(out)
     }

@@ -1,8 +1,8 @@
 Package: maxlike
 Type: Package
 Title: Estimate probability of occurrence using presence-only data.
-Version: 0.0-2
-Date: 2011-05-19
+Version: 0.0-3
+Date: 2011-05-27
 Depends: raster
 Author: Richard Chandler and Andy Royle
 Maintainer: Richard Chandler <rchandler@usgs.gov>
