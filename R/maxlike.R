@@ -21,7 +21,7 @@ maxlike <- function(formula, covData, ptData, removeDuplicates=FALSE,
         if(removeDuplicates)
             warning("removeDuplicates ignored when covData is a data.frame")
         duplicates <- rep(FALSE, npts)
-        x <- ptData
+        x <- as.data.frame(ptData)
         z <- covData
         }
     if(identical(cd.class, "RasterStack")) {

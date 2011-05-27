@@ -143,7 +143,7 @@ xy <- xyFromCell(pa, sample(Which(pa==1, cells=TRUE), 1000))
 plot(x1)
 points(xy)
 
-maxlike(~x1 + x2, raster=r, points=xy)
+maxlike(~x1 + x2, r, xy)
 maxlike(~x1, r, xy)
 
 }
