@@ -10,27 +10,27 @@
   the entire region of interest.
 }
 \usage{
-  maxlike(formula, rasters, points, removeDuplicates = FALSE, starts,
+  maxlike(formula, rasters, points, starts,
           hessian = TRUE, na.action = "na.omit", ...)
 }
 \arguments{
   \item{formula}{
-    A right-hand side formula describing the model
+    A right-hand side \code{\link{formula}} describing the model.
+    At least 1 continuous covariate must be present in the formula.
     }
   \item{rasters}{
     A `raster stack' created by the \code{\link{stack}} function
-    in the \code{\link{raster-package}}.
+    in the \code{\link{raster-package}}. It's a good idea to standardize
+    these by subtracting the mean and dividing by the standard
+    deviation. This will make it easier for \code{\link{optim}} to find
+    the maximum-likelihood estimates.
     }
   \item{points}{
     A \code{\link{data.frame}} with the X and Y coordinates.
     }
-  \item{removeDuplicates}{
-    Logical. If there is more than one point in a pixel, should the
-    duplicates be removed? This is only applicable if rasters is a
-    raster \code{\link{stack}}.
-    }
   \item{starts}{
-    Starting values for the parameters.
+    Starting values for the parameters. This should be a vector with as
+    many elements as there are parameters.
     }
   \item{hessian}{
     Logical. Should the hessian be computed and the variance-covariance matrix
@@ -57,7 +57,6 @@
   \item{vcov}{variance-covariance matrix}
   \item{AIC}{AIC}
   \item{call}{the original call}
-  \item{retained}{the points retained if duplicates were removed}
   \item{pts.removed}{The points removed due to missing values}
   \item{pix.removed}{The pixesls removed due to missing values}
   }

@@ -1,4 +1,4 @@
-maxlike <- function(formula, rasters, points, removeDuplicates=FALSE,
+maxlike <- function(formula, rasters, points,
                     starts, hessian=TRUE, na.action="na.omit", ...)
 {
     if(identical(formula, ~1))
@@ -19,11 +19,6 @@ maxlike <- function(formula, rasters, points, removeDuplicates=FALSE,
         cd.names <- layerNames(rasters)
         npix <- prod(dim(rasters)[1:2])
         cellID <- cellFromXY(rasters, points)
-        duplicates <- duplicated(cellID)
-        if(removeDuplicates) {
-            cellID <- unique(cellID)
-            npts <- length(cellID)
-            }
         x <- as.data.frame(matrix(extract(rasters, cellID), npts))
         z <- as.data.frame(matrix(getValues(rasters), npix))
         names(x) <- names(z) <- cd.names
@@ -84,8 +79,7 @@ maxlike <- function(formula, rasters, points, removeDuplicates=FALSE,
     }
     aic <- 2*fm$value + 2*npars
     out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call,
-                retained=points[!duplicates,], pts.removed=pts.removed,
-                pix.removed=pix.removed)
+                pts.removed=pts.removed, pix.removed=pix.removed)
     class(out) <- c("maxlikeFit", "list")
     return(out)
     }
