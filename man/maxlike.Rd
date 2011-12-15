@@ -1,45 +1,39 @@
 \name{maxlike}
 \alias{maxlike}
 \title{
-  Estimate probability of occurrence from presence-only data
+  Model probability of occurrence using presence-only data
 }
 \description{
-  Estimate the probability of occurrence from presence-only data
+  Model the probability of occurrence from presence-only data
   (ie, no observed absences) using covariate data
   from a random sample of presence points, and covariate data from
   the entire region of interest.
 }
 \usage{
-  maxlike(formula, covData, ptData, removeDuplicates = FALSE, starts,
+  maxlike(formula, rasters, points, removeDuplicates = FALSE, starts,
           hessian = TRUE, na.action = "na.omit", ...)
 }
 \arguments{
   \item{formula}{
     A right-hand side formula describing the model
     }
-  \item{covData}{
-    Either a `raster stack' created by the \code{\link{stack}} function
-    in the \code{\link{raster-package}}, or a \code{\link{data.frame}}
-    in which each row is a pixel with covariate data.
+  \item{rasters}{
+    A `raster stack' created by the \code{\link{stack}} function
+    in the \code{\link{raster-package}}.
     }
-  \item{ptData}{
-    If covData is a raster \code{\link{stack}}, ptData must be a
-    \code{\link{data.frame}} with the X and Y coordinates. If covData is
-    a \code{\link{data.frame}}, ptData must be a data.frame or a matrix
-    with the same column names as covData. In this case, each row is
-    covariate data for the presence locations.
+  \item{points}{
+    A \code{\link{data.frame}} with the X and Y coordinates.
     }
   \item{removeDuplicates}{
     Logical. If there is more than one point in a pixel, should the
-    duplicates be removed? This is only applicable if covData is a
-    raster \code{\link{stack}}. If it is a \code{\link{data.frame}}, you
-    should handle duplicates yourself.
+    duplicates be removed? This is only applicable if rasters is a
+    raster \code{\link{stack}}.
     }
   \item{starts}{
-    Parameter starting values
+    Starting values for the parameters.
     }
   \item{hessian}{
-    Should the hessian be computed and the variance-covariance matrix
+    Logical. Should the hessian be computed and the variance-covariance matrix
     returned?
     }
   \item{na.action}{
@@ -50,12 +44,11 @@
     }
 }
 \details{
-  Data from the entire region of interest are contained in covData.
+  Data from the entire region of interest are contained in rasters.
   Data from the presence locations are extracted using the
-  coordinates in \code{points} when covData is a raster
-  \code{\link{stack}}. Otherwise, they should be provided directly as a
-  \code{\link{data.frame}}. If using spatial data, covData and ptData
-  should both use the same coordinate system.
+  coordinates in \code{points}. Rasters and points
+  should both use the same coordinate system. The program does not check
+  this so it is up to the user.
   }
 \value{
   A list with 3 components
@@ -70,13 +63,16 @@
   }
 \note{
   In general it is very hard to obtain a random sample of presence
-  points. This could be done using radio telemetry, but other sources
-  of information such as museum specimens will almost surely include
-  some sort of sampling bias, which will invalidate the results of
-  presence-only models. Presence-absence data collected using random
-  sampling is always preferable.
+  points, which is a requirement of this method and of
+  MAXENT. This is one of many reasons why presence-absence data is
+  preferable.
   }
-
+\references{
+  J. A. Royle, R. B. Chandler, C. Yackulic and J.
+  D. Nichols. In Press. Likelihood analysis of species occurrence probability
+  from presence-only data for modelling species distributions. Methods
+  in Ecology and Evolution.
+}
 
 \seealso{ \code{\link{maxlike-package}}, \code{\link{raster}} }
 

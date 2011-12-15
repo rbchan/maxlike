@@ -1,11 +1,11 @@
 Package: maxlike
 Type: Package
 Title: Estimate probability of occurrence using presence-only data.
-Version: 0.0-3
-Date: 2011-05-27
+Version: 0.1-0
+Date: 2011-12-15
 Depends: raster
 Author: Richard Chandler and Andy Royle
 Maintainer: Richard Chandler <rchandler@usgs.gov>
-Description: Estimate probability of occurrence using presence-only data.
+Description: Provides a likelihood-based approach to modeling species distributions using presence-only data. In contrast to the popular software program MAXENT, this approach yields estimates of the probability of occurrence, which is a natural descriptor of a speciesdistribution.
 License: GPL (>=3)
 LazyLoad: yes

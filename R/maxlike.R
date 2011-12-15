@@ -1,44 +1,35 @@
-maxlike <- function(formula, covData, ptData, removeDuplicates=FALSE,
+maxlike <- function(formula, rasters, points, removeDuplicates=FALSE,
                     starts, hessian=TRUE, na.action="na.omit", ...)
 {
     if(identical(formula, ~1))
-        stop("At least one covariate must be specified in the formula")
+        stop("At least one continuous covariate must be specified in the formula")
     varnames <- all.vars(formula)
     call <- match.call()
-    npts <- nrow(ptData)
-    cd.class <- class(covData)[1]
-    if(!cd.class %in% c("RasterStack", "data.frame"))
-        stop("covData must be a raster stack or a data.frame")
-    pt.class <- class(ptData)[1]
+    npts <- nrow(points)
+    cd.class <- class(rasters)[1]
+    if(cd.class != "RasterStack")
+        stop("rasters must be a raster stack")
+    pt.class <- class(points)[1]
     if(!pt.class %in% c("matrix", "data.frame"))
-        stop("ptData must be a matrix or a data.frame")
-    pt.names <- colnames(ptData)
-    if(identical(cd.class, "data.frame")) {
-        cd.names <- colnames(covData)
-        npix <- nrow(covData)
-        if(!all(cd.names %in% pt.names))
-            stop("When covData is a data.frame, ptData must be a data.frame with the same column names")
-        if(removeDuplicates)
-            warning("removeDuplicates ignored when covData is a data.frame")
-        duplicates <- rep(FALSE, npts)
-        x <- as.data.frame(ptData)
-        z <- covData
-        }
+        stop("points must be a matrix or a data.frame")
+    if(ncol(points) != 2)
+        stop("points must have 2 columns containing the x- and y- coordinates")
+    pt.names <- colnames(points)
     if(identical(cd.class, "RasterStack")) {
-        cd.names <- layerNames(covData)
-        npix <- prod(dim(covData)[1:2])
-        cellID <- cellFromXY(covData, ptData)
+        cd.names <- layerNames(rasters)
+        npix <- prod(dim(rasters)[1:2])
+        cellID <- cellFromXY(rasters, points)
         duplicates <- duplicated(cellID)
         if(removeDuplicates) {
             cellID <- unique(cellID)
             npts <- length(cellID)
             }
-        x <- as.data.frame(matrix(extract(covData, cellID), npts))
-        z <- as.data.frame(matrix(getValues(covData), npix))
+        x <- as.data.frame(matrix(extract(rasters, cellID), npts))
+        z <- as.data.frame(matrix(getValues(rasters), npix))
         names(x) <- names(z) <- cd.names
         }
     if(!all(varnames %in% cd.names))
-        stop("at least 1 covariate in the formula is not in covData.")
+        stop("at least 1 covariate in the formula is not in rasters.")
     X.mf <- model.frame(formula, x, na.action=na.action)
     X.mf.a <- attributes(X.mf)
     pts.removed <- integer(0)
@@ -73,7 +64,8 @@ maxlike <- function(formula, covData, ptData, removeDuplicates=FALSE,
     nll <- function(pars) {
         psix <- plogis(X %*% pars)
         psiz <- plogis(Z %*% pars)
-        -1*sum(log(psix/sum(psiz)))
+#        -1*sum(log(psix/sum(psiz)))
+        -1*sum(log(psix/sum(psiz) + 1e-50))
         }
 
     fm <- optim(starts, nll, hessian=hessian, ...)
@@ -82,14 +74,17 @@ maxlike <- function(formula, covData, ptData, removeDuplicates=FALSE,
         vc <- try(solve(fm$hessian))
         if(identical(class(vc), "matrix"))
            se <- sqrt(diag(vc))
+        else {
+            vc <- matrix(NA, npars, npars)
+            se <- rep(NA, npars)
         }
-    else {
+    } else {
         vc <- matrix(NA, npars, npars)
         se <- rep(NA, npars)
-        }
+    }
     aic <- 2*fm$value + 2*npars
     out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call,
-                retained=ptData[!duplicates,], pts.removed=pts.removed,
+                retained=points[!duplicates,], pts.removed=pts.removed,
                 pix.removed=pix.removed)
     class(out) <- c("maxlikeFit", "list")
     return(out)
@@ -116,16 +111,16 @@ vcov.maxlikeFit <- function(object, ...) object$vcov
 
 
 
-predict.maxlikeFit <- function(object, newdata, ...) {
-    form <- as.formula(object$call$formula)
-    if(missing(newdata))
-        stop("newdata must be supplied")
-    if(!identical(class(newdata)[1], "data.frame"))
-        stop("newdata must be a data.frame")
-    X <- model.matrix(form, newdata)
-    E <- drop(plogis(X %*% coef(object)))
-    return(E)
-    }
+#predict.maxlikeFit <- function(object, newdata, ...) {
+#    form <- as.formula(object$call$formula)
+#    if(missing(newdata))
+#        stop("newdata must be supplied")
+#    if(!identical(class(newdata)[1], "data.frame"))
+#        stop("newdata must be a data.frame")
+#    X <- model.matrix(form, newdata)
+#    E <- drop(plogis(X %*% coef(object)))
+#    return(E)
+#    }
 
 
 
