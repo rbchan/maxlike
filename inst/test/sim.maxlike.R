@@ -47,3 +47,62 @@ abline(v=1, lwd=2, col=4)
 hist(simout[,3])
 abline(v=0.5, lwd=2, col=4)
 par(op)
+
+
+
+
+
+
+
+
+# Demonstration that parameters are not identifiable with only
+# a single categorical covariate
+
+sim2 <- function() {
+    x1 <- raster(matrix(c(0,1), 100, 100), xmn=0, xmx=100, ymn=0, ymx=100)
+
+    logit.psi <- -1 + 1*x1
+    psi <- exp(logit.psi)/(1+exp(logit.psi))
+
+    r <- stack(x1)
+    r@layernames <- c("x1")
+
+    pa <- matrix(NA, 100, 100)
+    pa[] <- rbinom(1e4, 1, as.matrix(psi))
+    pa <- raster(pa, 0, 100, 0, 100)
+    xy <- xyFromCell(pa, sample(Which(pa==1, cells=TRUE), 1000))
+
+    return(list(r=r, xy=xy))
+}
+
+
+str(sim2(), 1)
+
+
+plot(sim2()$r)
+
+
+
+
+
+nsim2 <- 10
+simout2 <- matrix(NA, nsim2, 2)
+colnames(simout2) <- c('beta0', 'beta1')
+
+set.seed(343)
+for(i in 1:nsim2) {
+    require(maxlike)
+    cat("sim2", i, "\n")
+    sim.i <- sim2()
+    fm.i <- maxlike(~x1, sim.i$r, sim.i$xy)
+    simout2[i,] <- coef(fm.i)
+}
+
+simout2
+
+op <- par(mfrow=c(2,1))
+hist(simout2[,1])
+abline(v=-1, lwd=2, col=4)
+hist(simout2[,2])
+abline(v=1, lwd=2, col=4)
+par(op)
