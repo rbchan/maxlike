@@ -116,12 +116,17 @@ x1 <- raster(outer(x1, x1), xmn=0, xmx=100, ymn=0, ymx=100)
 
 x2 <- raster(matrix(runif(1e4), 100, 100), 0, 100, 0, 100)
 
+# The raster package doesn't handle factors, so you need to
+# code them as dummy variables.
+# Note, using asFactor(x3) will not help
+x3 <- raster(matrix(c(0,1), 100, 100), 0, 100, 0, 100)
+
 logit.psi <- -1 + 1*x1 + 0*x2
 psi <- exp(logit.psi)/(1+exp(logit.psi))
 plot(psi)
 
-r <- stack(x1, x2)
-r@layernames <- c("x1", "x2")
+r <- stack(x1, x2, x3)
+r@layernames <- c("x1", "x2", "x3")
 plot(r)
 
 set.seed(131)
@@ -139,7 +144,7 @@ plot(x1)
 points(xy)
 
 maxlike(~x1 + x2, r, xy)
-maxlike(~x1, r, xy)
+maxlike(~x2 + x3, r, xy)
 
 }
 
