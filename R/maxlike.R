@@ -32,7 +32,8 @@ maxlike <- function(formula, rasters, points,
         pts.removed <- X.mf.a$na.action
         npts.removed <- length(pts.removed)
         if(npts.removed > 0)
-            warning(paste(npts.removed, "points removed due to missing values"))
+            warning(paste(npts.removed,
+                          "points removed due to missing values"))
         }
     X <- model.matrix(formula, X.mf)
     Z.mf <- model.frame(formula, z, na.action=na.action)
@@ -42,7 +43,8 @@ maxlike <- function(formula, rasters, points,
         pix.removed <- Z.mf.a$na.action
         npix.removed <- length(pix.removed)
         if(npix.removed > 0)
-            warning(paste(npix.removed, "pixels removed due to missing values"))
+            warning(paste(npix.removed,
+                          "pixels removed due to missing values"))
         }
     Z <- model.matrix(formula, Z.mf)
     npars <- ncol(X)
@@ -79,42 +81,11 @@ maxlike <- function(formula, rasters, points,
     }
     aic <- 2*fm$value + 2*npars
     out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call,
-                pts.removed=pts.removed, pix.removed=pix.removed)
+                pts.removed=pts.removed, pix.removed=pix.removed,
+                optim=fm)
     class(out) <- c("maxlikeFit", "list")
     return(out)
     }
-
-
-
-
-# S3 methods
-
-print.maxlikeFit <- function(x, ...) {
-    cat("\nCall:", paste(deparse(x$call)), "\n\n")
-    cat("Coefficients:\n")
-    print(x$Est, ...)
-    cat("\nAIC:", x$AIC, "\n\n")
-    }
-
-
-
-coef.maxlikeFit <- function(object, ...) object$Est[,"Est"]
-
-
-vcov.maxlikeFit <- function(object, ...) object$vcov
-
-
-
-#predict.maxlikeFit <- function(object, newdata, ...) {
-#    form <- as.formula(object$call$formula)
-#    if(missing(newdata))
-#        stop("newdata must be supplied")
-#    if(!identical(class(newdata)[1], "data.frame"))
-#        stop("newdata must be a data.frame")
-#    X <- model.matrix(form, newdata)
-#    E <- drop(plogis(X %*% coef(object)))
-#    return(E)
-#    }
 
 
 

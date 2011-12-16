@@ -36,6 +36,15 @@ test.maxlike.fit.simple.1 <- function() {
     checkEqualsNumeric(fm2$pix.removed, c(1,5))
     checkEqualsNumeric(fm2$pts.removed, 2)
 
+    checkEqualsNumeric(AIC(fm2), 16017.43, tol=1e-6)
+    checkEqualsNumeric(logLik(fm2), -8004.717, tol=1e-6)
+    checkEqualsNumeric(confint(fm2),
+                       matrix(c(0.09770203,  0.992682,
+                                2.06111183,  2.839246,
+                                -2.73433869, -1.987336,
+                                1.71726661,  2.558565),
+                       4, 2, byrow=TRUE), tol=1e-6)
+
 }
 
 

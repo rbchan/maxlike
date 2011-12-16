@@ -98,7 +98,8 @@ layerNames(ep) <- c("elev", "precip")
 
 # Fit a model
 fm <- maxlike(~elev + I(elev^2) + precip, ep, xy)
-fm
+summary(fm)
+
 
 # Expected probability of occurrence
 beta <- coef(fm)
@@ -111,6 +112,7 @@ points(xy)
 
 # Simulation example
 
+set.seed(131)
 x1 <- sort(rnorm(100))
 x1 <- raster(outer(x1, x1), xmn=0, xmx=100, ymn=0, ymx=100)
 
@@ -129,7 +131,6 @@ r <- stack(x1, x2, x3)
 r@layernames <- c("x1", "x2", "x3")
 plot(r)
 
-set.seed(131)
 pa <- matrix(NA, 100, 100)
 pa[] <- rbinom(1e4, 1, as.matrix(psi))
 str(pa)
@@ -143,8 +144,13 @@ xy <- xyFromCell(pa, sample(Which(pa==1, cells=TRUE), 1000))
 plot(x1)
 points(xy)
 
-maxlike(~x1 + x2, r, xy)
-maxlike(~x2 + x3, r, xy)
+fm2 <- maxlike(~x1 + x2 + x3, r, xy)
+
+summary(fm2)
+confint(fm2)
+AIC(fm2)
+logLik(fm2)
+
 
 }
 
