@@ -61,8 +61,7 @@ maxlike <- function(formula, rasters, points,
     nll <- function(pars) {
         psix <- plogis(X %*% pars)
         psiz <- plogis(Z %*% pars)
-#        -1*sum(log(psix/sum(psiz)))
-        -1*sum(log(psix/sum(psiz) + 1e-50))
+        -1*sum(log(psix/sum(psiz) + .Machine$double.eps))
         }
 
     fm <- optim(starts, nll, hessian=hessian, ...)
