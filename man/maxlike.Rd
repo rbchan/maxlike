@@ -67,15 +67,17 @@
   points, which is a requirement of both the Royle et al. (In press)
   method and of MAXENT. This is one of many reasons why presence-absence
   data are preferable. When presence-absence data are available, they
-  can be modeled using functions such as \code{\link{glm}}. Creating
-  maps of prediction from \code{\link{glm}} can be accomplished in the
+  can be modeled using functions such as
+  \code{\link[stats]{glm}}. Creating
+  maps of prediction from \code{\link[stats]{glm}} can be accomplished
+  in the
   same way as is shown in the example below.
 
   Another weakness of models for presence-only data is that they do not
   allow one to model detection probability, which is typically less than
   one in field conditions. If detection probability is affected by the same
   covariates that affect occurrence probability, then bias
-  is inevitable. The R package \code{\link{unmarked}}
+  is inevitable. The R package \pkg{unmarked}
   (Fiske and Chandler 2011) offers numerous
   methods for jointly modeling both occurrence and detection probability
   when detection/non-detection data are available.
