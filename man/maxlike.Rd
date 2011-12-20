@@ -5,7 +5,7 @@
 }
 \description{
   Model the probability of occurrence from presence-only data
-  (ie, no observed absences) using covariate data
+  (i.e., datasets lacking observed absences) using covariate data
   from a random sample of presence points, and covariate data from
   the entire region of interest.
 }
@@ -26,11 +26,13 @@
     the maximum-likelihood estimates.
     }
   \item{points}{
-    A \code{\link{data.frame}} with the X and Y coordinates.
+    A \code{\link{data.frame}} with the X and Y coordinates of the
+    presence locations.
     }
   \item{starts}{
     Starting values for the parameters. This should be a vector with as
-    many elements as there are parameters.
+    many elements as there are parameters. By default, all starting
+    values are 0, which should be adequate if covariates are standardized.
     }
   \item{hessian}{
     Logical. Should the hessian be computed and the variance-covariance matrix
@@ -62,15 +64,31 @@
   }
 \note{
   In general it is very hard to obtain a random sample of presence
-  points, which is a requirement of this method and of
-  MAXENT. This is one of many reasons why presence-absence data is
-  preferable.
+  points, which is a requirement of both the Royle et al. (In press)
+  method and of MAXENT. This is one of many reasons why presence-absence
+  data are preferable. When presence-absence data are available, they
+  can be modeled using functions such as \code{\link{glm}}. Creating
+  maps of prediction from \code{\link{glm}} can be accomplished in the
+  same way as is shown in the example below.
+
+  Another weakness of models for presence-only data is that they do not
+  allow one to model detection probability, which is typically less than
+  one in field conditions. If detection probability is affected by the same
+  covariates that affect occurrence probability, then bias
+  is inevitable. The R package \code{\link{unmarked}}
+  (Fiske and Chandler 2011) offers numerous
+  methods for jointly modeling both occurrence and detection probability
+  when detection/non-detection data are available.
   }
 \references{
-  J. A. Royle, R. B. Chandler, C. Yackulic and J.
+  Royle, J.A., R.B. Chandler, C. Yackulic and J.
   D. Nichols. In Press. Likelihood analysis of species occurrence probability
   from presence-only data for modelling species distributions. Methods
   in Ecology and Evolution.
+
+  Fiske, I. and R.B. Chandler. 2011. unmarked: An R Package for Fitting
+  Hierarchical Models of Wildlife Occurrence and Abundance. Journal of
+  Statistical Software 43(10).
 }
 
 \seealso{ \code{\link{maxlike-package}}, \code{\link{raster}} }
@@ -78,6 +96,7 @@
 \examples{
 
 # Fake data based on R's volcano dataset
+# See help(raster) for other ways of importing raster data
 
 data(MaungaWhau)
 elev <- raster(MaungaWhau$elev, 0, 61, 0, 87)
@@ -101,7 +120,7 @@ fm <- maxlike(~elev + I(elev^2) + precip, ep, xy)
 summary(fm)
 
 
-# Expected probability of occurrence
+# Produce species distribution map (i.e., expected probability of occurrence)
 beta <- coef(fm)
 E.logitpsi <- beta[1] + beta[2]*elev + beta[3]*(elev^2) + beta[4]*precip
 E.psi <- exp(E.logitpsi)/(1+exp(E.logitpsi))

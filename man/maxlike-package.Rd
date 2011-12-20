@@ -2,7 +2,7 @@
 \alias{maxlike-package}
 \docType{package}
 \title{
-  Model species distributions by estimate the probability of occurrence
+  Model species distributions by estimating the probability of occurrence
   using presence-only data.
 }
 \description{
@@ -12,23 +12,25 @@
   locations and environmental data for the study area. MAXENT is a
   popular software program for modeling species distributions, but it does
   not estimate the probability of occurrence. Rather it returns various
-  indices that are not easy to interpret. This package provides a simple
+  indices that are not easy to interpret (see Royle et al. In
+  Press). Package "maxlike" provides a simple
   likelihood-based alternative.
 }
 \note{
   All presence-only models require a random sample of data from
   locations where the species is present. Unfortunately, random sampling
-  is not a feature of most presence-only datasets, and bias should
+  is not a feature of most presence-only datasets, and bias in the
+  estimated probability surface should
   be expected in such cases. This assumption can be greatly relaxed if
   one has presence-absence data, which will always
-  contain more information about a species distribution.
+  contain more information about a species' distribution.
   }
 \details{
 \tabular{ll}{
 Package: \tab maxlike\cr
 Type: \tab Package\cr
 Version: \tab 0.1-0\cr
-Date: \tab 2011-12-15\cr
+Date: \tab 2011-12-20\cr
 License: \tab GPL (>=3) \cr
 LazyLoad: \tab yes\cr
 }
