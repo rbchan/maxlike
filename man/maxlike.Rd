@@ -11,7 +11,7 @@
 }
 \usage{
   maxlike(formula, rasters, points, starts,
-          hessian = TRUE, na.action = "na.omit", ...)
+          hessian = TRUE, na.action = "na.omit", fixed, ...)
 }
 \arguments{
   \item{formula}{
@@ -41,6 +41,13 @@
   \item{na.action}{
     See \code{\link{options}} for choices
   }
+  \item{fixed}{
+    Optional vector for fixing parameters. It must be
+    of length equal to the number of parameters in the
+    model. If an element of fixed is NA, then the parameter is
+    estimated, otherwise if it is a real number, the parameter is fixed
+    at this value.
+    }
   \item{...}{
     Additional arguments passed to \code{\link{optim}}
     }
@@ -73,6 +80,13 @@
   in the
   same way as is shown in the example below.
 
+  The MAXENT software assumes that species prevalence is known a
+  priori. Even if the user does not specify a value for prevalence, a
+  value is chosen automatically. In the unlikely scenario that
+  prevalence is known a priori, one could use this info with
+  \code{maxlike} by fixing the
+  intercept using the \code{fixed} argument. See examples below.
+
   Another weakness of models for presence-only data is that they do not
   allow one to model detection probability, which is typically less than
   one in field conditions. If detection probability is affected by the same
@@ -81,7 +95,16 @@
   (Fiske and Chandler 2011) offers numerous
   methods for jointly modeling both occurrence and detection probability
   when detection/non-detection data are available.
+}
+
+\section{Warning}{
+  Maximizing the log-likelihood function is achieved using the
+  \code{\link{optim}} function, which can fail to find the global optima
+  of likelihood function if sensible starting values are not
+  supplied. The default starting values are \code{rep(0, npars)}, which will
+  often be adequate if the covariates have been standardized.
   }
+
 \references{
   Royle, J.A., R.B. Chandler, C. Yackulic and J.
   D. Nichols. 2012. Likelihood analysis of species occurrence probability
