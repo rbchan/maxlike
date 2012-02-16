@@ -64,7 +64,7 @@
   }
 \note{
   In general it is very hard to obtain a random sample of presence
-  points, which is a requirement of both the Royle et al. (In press)
+  points, which is a requirement of both the Royle et al. (2012)
   method and of MAXENT. This is one of many reasons why presence-absence
   data are preferable. When presence-absence data are available, they
   can be modeled using functions such as
@@ -84,9 +84,9 @@
   }
 \references{
   Royle, J.A., R.B. Chandler, C. Yackulic and J.
-  D. Nichols. In Press. Likelihood analysis of species occurrence probability
+  D. Nichols. 2012. Likelihood analysis of species occurrence probability
   from presence-only data for modelling species distributions. Methods
-  in Ecology and Evolution.
+  in Ecology and Evolution. doi: 10.1111/j.2041-210X.2011.00182.x
 
   Fiske, I. and R.B. Chandler. 2011. unmarked: An R Package for Fitting
   Hierarchical Models of Wildlife Occurrence and Abundance. Journal of

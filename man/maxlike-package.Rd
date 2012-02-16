@@ -6,8 +6,9 @@
   using presence-only data.
 }
 \description{
-  A species distribution can be characterized by the probability that it
-  occurs at some location in space. This can be easily accomplished
+  A species' distribution can be characterized by the probability that it
+  occurs at some location in space. Estimating occurrence probability
+  can be easily accomplished
   using presence-absence data, but often researchers only have presence
   locations and environmental data for the study area. MAXENT is a
   popular software program for modeling species distributions, but it does
@@ -29,17 +30,17 @@
 \tabular{ll}{
 Package: \tab maxlike\cr
 Type: \tab Package\cr
-Version: \tab 0.1-0\cr
-Date: \tab 2011-12-20\cr
+Version: \tab 0.1-1\cr
+Date: \tab 2012-02-17\cr
 License: \tab GPL (>=3) \cr
 LazyLoad: \tab yes\cr
 }
 }
 \references{
   J. A. Royle, R. B. Chandler, C. Yackulic and J.
-  D. Nichols. In Press. Likelihood analysis of species occurrence probability
+  D. Nichols. 2012. Likelihood analysis of species occurrence probability
   from presence-only data for modelling species distributions. Methods
-  in Ecology and Evolution.
+  in Ecology and Evolution. doi: 10.1111/j.2041-210X.2011.00182.x.
 }
 
 \seealso{ \code{\link{maxlike}}, \code{\link{raster}} }
