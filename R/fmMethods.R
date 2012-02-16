@@ -47,7 +47,7 @@ logLik.maxlikeFit <- function(object, ...) {
 
 
 AIC.maxlikeFit <- function(object, ..., k=2) {
-    2*object$optim$value + k*length(coef(object))
+    2*object$optim$value + k*length(coef(object)[object$not.fixed])
 }
 
 

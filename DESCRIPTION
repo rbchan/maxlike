@@ -6,10 +6,6 @@ Date: 2012-02-17
 Depends: raster
 Author: Richard Chandler and Andy Royle
 Maintainer: Richard Chandler <rchandler@usgs.gov>
-Description: Provides a likelihood-based approach to modeling species
-distributions using presence-only data. In contrast to the popular
-software program MAXENT, this approach yields estimates of the
-probability of occurrence, which is a natural descriptor of a species'
-distribution.
+Description: Provides a likelihood-based approach to modeling species distributions using presence-only data. In contrast to the popular software program MAXENT, this approach yields estimates of the probability of occurrence, which is a natural descriptor of a species' distribution.
 License: GPL (>=3)
 LazyLoad: yes

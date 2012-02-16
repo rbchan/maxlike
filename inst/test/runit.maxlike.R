@@ -1,4 +1,4 @@
-test.maxlike.fit.simple.1 <- function() {
+test.maxlike.fit1 <- function() {
 
     data(MaungaWhau)
     elev <- raster(MaungaWhau$elev, 0, 61, 0, 87)
@@ -44,6 +44,21 @@ test.maxlike.fit.simple.1 <- function() {
                                 -2.73433869, -1.987336,
                                 1.71726661,  2.558565),
                        4, 2, byrow=TRUE), tol=1e-6)
+
+    # Test update
+    fm2u <- update(fm2)
+    checkEquals(fm2, fm2u)
+
+    # refit using fixed values
+    fix <- c(0,2,-2,2)
+    checkException(fm3 <- update(fm2, fixed=fix))
+    fix <- c(NA,NA,NA,NA)
+    checkException(fm3 <- update(fm2, fixed=fix))
+    fix <- c(0,NA,NA,NA)
+    fm3 <- update(fm2, fixed=fix)
+    checkEqualsNumeric(coef(fm3),
+                       c(0.000000, 2.121397, -2.003473, 1.781255),
+                       tol=1e-6)
 
 }
 
