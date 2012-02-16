@@ -12,7 +12,7 @@
   using presence-absence data, but often researchers only have presence
   locations and environmental data for the study area. MAXENT is a
   popular software program for modeling species distributions, but it does
-  not estimate the probability of occurrence. Rather it returns various
+  not estimate the probability of occurrence. Rather, it returns various
   indices that are not easy to interpret (see Royle et al. In
   Press). Package "maxlike" provides a simple
   likelihood-based alternative.

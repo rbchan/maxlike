@@ -83,9 +83,10 @@
   The MAXENT software assumes that species prevalence is known a
   priori. Even if the user does not specify a value for prevalence, a
   value is chosen automatically. In the unlikely scenario that
-  prevalence is known a priori, one could use this info with
-  \code{maxlike} by fixing the
-  intercept using the \code{fixed} argument. See examples below.
+  prevalence is known a priori, one could use this infomation
+  by fixing the
+  intercept using the \code{fixed} argument in \code{maxlike}. See
+  examples below.
 
   Another weakness of models for presence-only data is that they do not
   allow one to model detection probability, which is typically less than
@@ -151,6 +152,16 @@ E.logitpsi <- beta[1] + beta[2]*elev + beta[3]*(elev^2) + beta[4]*precip
 E.psi <- exp(E.logitpsi)/(1+exp(E.logitpsi))
 plot(E.psi)
 points(xy)
+
+
+# Suppose you knew that occurrence probability was 0.6 at the mean
+# values of the covariates.  (This is similar to what MAXENT's logistic
+# transformation does by default.)
+# You could fix the intercept at this value as follows:
+
+fmf <- maxlike(~elev + I(elev^2) + precip, ep, xy,
+    fix=c(qlogis(0.6), NA, NA, NA))
+fmf
 
 
 
