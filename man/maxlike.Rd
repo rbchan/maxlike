@@ -125,54 +125,67 @@
   Statistical Software 43(10).
 }
 
-\seealso{ \code{\link{maxlike-package}}, \code{\link{raster}} }
+\seealso{ \code{\link{maxlike-package}}, \code{\link{raster}},
+          \code{\link{carw}} }
 
 \examples{
 
-# Fake data based on R's volcano dataset
-# See help(raster) for other ways of importing raster data
+# Carolina Wren data used in Royle et. al (2012)
+data(carw)
 
-data(MaungaWhau)
-elev <- raster(MaungaWhau$elev, 0, 61, 0, 87)
-precip <- raster(MaungaWhau$precip, 0, 61, 0, 87)
-xy <- MaungaWhau$xy
+# Covert data.frame to a list of rasters
+rl <- lapply(carw.data$raster.data, function(x) {
+   m <- matrix(x, nrow=carw.data$dim[1], ncol=carw.data$dim[2], byrow=TRUE)
+   r <- raster(m)
+   extent(r) <- carw.data$ext
+   r
+})
 
-# Elevation, standardized
-plot(elev)
-points(xy)
+# Create a raster stack and add layer names
+rs <- stack(rl[[1]], rl[[2]], rl[[3]], rl[[4]], rl[[5]], rl[[6]])
+layerNames(rs) <- names(carw.data$raster.data)
 
-# Precipitation, standardized
-plot(precip)
-points(xy)
+plot(rs)
 
-# Stack them and make sure they are named
-ep <- stack(elev, precip)
-layerNames(ep) <- c("elev", "precip")
 
 # Fit a model
-fm <- maxlike(~elev + I(elev^2) + precip, ep, xy)
-summary(fm)
+fm <- maxlike(~pcMix + I(pcMix^2) + pcDec + I(pcDec^2)+ pcCon +
+    I(pcCon^2) + pcGr + I(pcGr^2) +
+    Lat + I(Lat^2) + Lon + I(Lon^2), rs, carw.data$xy1,
+    method="BFGS", removeDuplicates=TRUE)
+
+fm
 
 
-# Produce species distribution map (i.e., expected probability of occurrence)
-beta <- coef(fm)
-E.logitpsi <- beta[1] + beta[2]*elev + beta[3]*(elev^2) + beta[4]*precip
-E.psi <- exp(E.logitpsi)/(1+exp(E.logitpsi))
-plot(E.psi)
-points(xy)
+\dontrun{
+# Fit model using MAXENT.
+# maxent appears to ignore the defaultprevalence argument
+# To see it's effect, use the stand-along MAXENT program
+library(dismo)
+fm.me <- maxent(rs, carw.data$xy1,
+    args=c("noproduct", "nothreshold", "nohinge", "noautofeature",
+           "defaultprevalence=0.5"))
+}
+
+# MAXENT sets "default prevalence" to an arbitrary value, 0.5
+# We could do the same by fixing the intercept at logit(0.5)=0
+# However, it seems more appropriate to estimate this important parameter
+
+fm.fix <- update(fm, fixed=c(0, rep(NA,length(coef(fm))-1)))
 
 
-# Suppose you knew that occurrence probability was 0.6 at the mean
-# values of the covariates.  (This is similar to what MAXENT's logistic
-# transformation does by default.)
-# You could fix the intercept at this value as follows:
 
-fmf <- maxlike(~elev + I(elev^2) + precip, ep, xy,
-    fix=c(qlogis(0.6), NA, NA, NA))
-fmf
+# Produce species distribution map (ie, expected probability of occurrence)
+psi.hat <- predict(fm)
+plot(psi.hat)
+points(carw.data$xy1, pch=16, cex=0.1)
 
 
 
+
+
+
+\dontrun{
 
 # Simulation example
 
@@ -215,6 +228,7 @@ confint(fm2)
 AIC(fm2)
 logLik(fm2)
 
+}
 
 }
 

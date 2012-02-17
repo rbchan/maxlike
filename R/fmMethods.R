@@ -53,5 +53,31 @@ AIC.maxlikeFit <- function(object, ..., k=2) {
 
 
 
+predict.maxlikeFit <- function(object, rasters, ...) {
+    e <- coef(object)
+    if(missing(rasters)) {
+        rasters <- try(get(as.character(object$call$rasters)))
+        if(identical(class(rasters)[1],  "try-error"))
+            stop("could not find the raster data")
+        warning("The raster data was not supplied. Using the data found in the workspace.")
+    }
+    cd.names <- layerNames(rasters)
+    npix <- prod(dim(rasters)[1:2])
+    z <- as.data.frame(matrix(getValues(rasters), npix))
+    names(z) <- cd.names
+    formula <- object$call$formula
+    varnames <- all.vars(formula)
+    if(!all(varnames %in% cd.names))
+        stop("at least 1 covariate in the formula is not in rasters.")
+    Z.mf <- model.frame(formula, z, na.action="na.pass")
+    Z <- model.matrix(terms(Z.mf), Z.mf)
+    psi.hat <- plogis(Z %*% coef(object))
+    psi.mat <- matrix(psi.hat, dim(rasters)[1], dim(rasters)[2],
+                      byrow=TRUE)
+    psi.raster <- raster(psi.mat)
+    extent(psi.raster) <- extent(rasters)
+    psi.raster
+}
+
 
 

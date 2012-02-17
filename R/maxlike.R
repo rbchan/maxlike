@@ -108,6 +108,8 @@ maxlike <- function(formula, rasters, points, starts, hessian=TRUE,
     }
     dimnames(vc) <- list(parnames, parnames)
     aic <- 2*fm$value + 2*npars
+
+    fitted <- plogis(Z %*% par)
     out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call,
                 pts.removed=pts.removed, pix.removed=pix.removed,
 #                duplicates=duplicates,
