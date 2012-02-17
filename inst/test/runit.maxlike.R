@@ -60,6 +60,9 @@ test.maxlike.fit1 <- function() {
                        c(0.000000, 2.121397, -2.003473, 1.781255),
                        tol=1e-6)
 
+    psi.hat <- predict(fm2, ep2)
+    checkEqualsNumeric(cellStats(psi.hat), 0.3538176, tol=1e-6)
+
 }
 
 

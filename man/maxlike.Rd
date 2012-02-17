@@ -58,7 +58,7 @@
     }
 }
 \details{
-  Data from the entire region of interest are contained in rasters.
+  Covariate data for the entire region of interest are contained in \code{rasters}.
   Data from the presence locations are extracted using the
   coordinates in \code{points}. Rasters and points
   should both use the same coordinate system. The program does not check
@@ -84,17 +84,13 @@
   data are preferable. When presence-absence data are available, they
   can be modeled using functions such as
   \code{\link[stats]{glm}}. Creating
-  maps of prediction from \code{\link[stats]{glm}} can be accomplished
-  in the
-  same way as is shown in the example below.
+  maps of prediction from \code{\link[stats]{glm}} is easily
+  accomplished.
 
   The MAXENT software assumes that species prevalence is known a
-  priori. Even if the user does not specify a value for prevalence, a
-  value is chosen automatically. In the unlikely scenario that
-  prevalence is known a priori, one could use this infomation
-  by fixing the
-  intercept using the \code{fixed} argument in \code{maxlike}. See
-  examples below.
+  priori. If the user does not specify a value for prevalence,
+  prevalence is set to 0.5. MAXENT predictions are highly sensitive to
+  this setting. In contrast, \code{maxlike} directly estimates prevalence.
 
   Another weakness of models for presence-only data is that they do not
   allow one to model detection probability, which is typically less than
@@ -109,9 +105,15 @@
 \section{Warning}{
   Maximizing the log-likelihood function is achieved using the
   \code{\link{optim}} function, which can fail to find the global optima
-  of likelihood function if sensible starting values are not
+  if sensible starting values are not
   supplied. The default starting values are \code{rep(0, npars)}, which will
-  often be adequate if the covariates have been standardized.
+  often be adequate if the covariates have been
+  standardized. Standardizing covariates is thus recommended.
+  Even when covariates are standardized, it is always a good idea to try
+  various starting values to see if the
+  log-likelihood can be increased. When fitting models with many
+  parameters, good starting values can be found by fitting simpler
+  models first.
   }
 
 \references{
@@ -154,31 +156,25 @@ fm <- maxlike(~pcMix + I(pcMix^2) + pcDec + I(pcDec^2)+ pcCon +
     Lat + I(Lat^2) + Lon + I(Lon^2), rs, carw.data$xy1,
     method="BFGS", removeDuplicates=TRUE)
 
-fm
-
-
-\dontrun{
-# Fit model using MAXENT.
-# maxent appears to ignore the defaultprevalence argument
-# To see it's effect, use the stand-along MAXENT program
-library(dismo)
-fm.me <- maxent(rs, carw.data$xy1,
-    args=c("noproduct", "nothreshold", "nohinge", "noautofeature",
-           "defaultprevalence=0.5"))
-}
-
-# MAXENT sets "default prevalence" to an arbitrary value, 0.5
-# We could do the same by fixing the intercept at logit(0.5)=0
-# However, it seems more appropriate to estimate this important parameter
-
-fm.fix <- update(fm, fixed=c(0, rep(NA,length(coef(fm))-1)))
+summary(fm)
+confint(fm)
+AIC(fm)
+logLik(fm)
 
 
 
 # Produce species distribution map (ie, expected probability of occurrence)
-psi.hat <- predict(fm)
+psi.hat <- predict(fm, rs)
 plot(psi.hat)
 points(carw.data$xy1, pch=16, cex=0.1)
+
+
+
+# MAXENT sets "default prevalence" to an arbitrary value, 0.5
+# We could do the same by fixing the intercept at logit(0.5)=0
+# However, it seems more appropriate to estimate this parameter
+
+fm.fix <- update(fm, fixed=c(0, rep(NA,length(coef(fm))-1)))
 
 
 
@@ -195,8 +191,7 @@ x1 <- raster(outer(x1, x1), xmn=0, xmx=100, ymn=0, ymx=100)
 
 x2 <- raster(matrix(runif(1e4), 100, 100), 0, 100, 0, 100)
 
-# The raster package doesn't handle factors, so you need to
-# code them as dummy variables.
+# Code factors as dummy variables.
 # Note, using asFactor(x3) will not help
 x3 <- raster(matrix(c(0,1), 100, 100), 0, 100, 0, 100)
 

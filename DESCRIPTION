@@ -1,6 +1,7 @@
 Package: maxlike
 Type: Package
-Title: Estimate probability of occurrence using presence-only data.
+Title: Model species distributions by estimating the probability of occurrence
+  using presence-only data.
 Version: 0.1-1
 Date: 2012-02-17
 Depends: R (>= 2.10.0), raster
