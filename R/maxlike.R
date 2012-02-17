@@ -1,5 +1,5 @@
-maxlike <- function(formula, rasters, points,
-                    starts, hessian=TRUE, na.action="na.omit", fixed, ...)
+maxlike <- function(formula, rasters, points, starts, hessian=TRUE,
+                    fixed, removeDuplicates=FALSE, na.action="na.omit", ...)
 {
     if(identical(formula, ~1))
         stop("At least one continuous covariate must be specified in the formula")
@@ -19,6 +19,11 @@ maxlike <- function(formula, rasters, points,
         cd.names <- layerNames(rasters)
         npix <- prod(dim(rasters)[1:2])
         cellID <- cellFromXY(rasters, points)
+        duplicates <- duplicated(cellID)
+        if(removeDuplicates) {
+            cellID <- unique(cellID)
+            npts <- length(cellID)
+            }
         x <- as.data.frame(matrix(extract(rasters, cellID), npts))
         z <- as.data.frame(matrix(getValues(rasters), npix))
         names(x) <- names(z) <- cd.names
@@ -105,6 +110,7 @@ maxlike <- function(formula, rasters, points,
     aic <- 2*fm$value + 2*npars
     out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call,
                 pts.removed=pts.removed, pix.removed=pix.removed,
+#                duplicates=duplicates,
                 optim=fm, not.fixed=not.fixed)
     class(out) <- c("maxlikeFit", "list")
     return(out)

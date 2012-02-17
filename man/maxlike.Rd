@@ -10,8 +10,8 @@
   the entire region of interest.
 }
 \usage{
-  maxlike(formula, rasters, points, starts,
-          hessian = TRUE, na.action = "na.omit", fixed, ...)
+  maxlike(formula, rasters, points, starts, hessian = TRUE,
+          fixed, removeDuplicates=FALSE, na.action = "na.omit", ...)
 }
 \arguments{
   \item{formula}{
@@ -38,9 +38,6 @@
     Logical. Should the hessian be computed and the variance-covariance matrix
     returned?
     }
-  \item{na.action}{
-    See \code{\link{options}} for choices
-  }
   \item{fixed}{
     Optional vector for fixing parameters. It must be
     of length equal to the number of parameters in the
@@ -48,6 +45,14 @@
     estimated, otherwise if it is a real number, the parameter is fixed
     at this value.
     }
+  \item{removeDuplicates}{
+    Logical. Should duplicate points be removed. Defaults to FALSE, but
+    note that the MAXENT default is TRUE. It is unclear why duplicate
+    points should be removed, but this option is provided for
+    comparative purposes.}
+  \item{na.action}{
+    See \code{\link{options}} for choices
+  }
   \item{...}{
     Additional arguments passed to \code{\link{optim}}
     }
@@ -60,14 +65,17 @@
   this so it is up to the user.
   }
 \value{
-  A list with 3 components
+  A list with 8 components
   \item{Est}{data.frame containing the parameter estimates (Ests) and
     standard errors (SE).}
   \item{vcov}{variance-covariance matrix}
   \item{AIC}{AIC}
   \item{call}{the original call}
   \item{pts.removed}{The points removed due to missing values}
-  \item{pix.removed}{The pixesls removed due to missing values}
+  \item{pix.removed}{The pixels removed due to missing values}
+  \item{optim}{The object returned by \code{\link{optim}}}
+  \item{not.fixed}{A logical vector indicating if a parameter was
+    estimated or fixed.}
   }
 \note{
   In general it is very hard to obtain a random sample of presence
@@ -162,6 +170,7 @@ points(xy)
 fmf <- maxlike(~elev + I(elev^2) + precip, ep, xy,
     fix=c(qlogis(0.6), NA, NA, NA))
 fmf
+
 
 
 
