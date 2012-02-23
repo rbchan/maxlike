@@ -29,7 +29,7 @@ maxlike <- function(formula, rasters, points, starts, hessian=TRUE,
         names(x) <- names(z) <- cd.names
         }
     if(!all(varnames %in% cd.names))
-        stop("at least 1 covariate in the formula is not in rasters.")
+        stop("at least 1 covariate in the formula is not in layerNames(rasters).")
     X.mf <- model.frame(formula, x, na.action=na.action)
     X.mf.a <- attributes(X.mf)
     pts.removed <- integer(0)
@@ -47,9 +47,9 @@ maxlike <- function(formula, rasters, points, starts, hessian=TRUE,
     if("na.action" %in% names(Z.mf.a)) {
         pix.removed <- Z.mf.a$na.action
         npix.removed <- length(pix.removed)
-        if(npix.removed > 0)
-            warning(paste(npix.removed,
-                          "pixels removed due to missing values"))
+#        if(npix.removed > 0)
+#            warning(paste(npix.removed,
+#                          "pixels removed due to missing values"))
         }
     Z <- model.matrix(formula, Z.mf)
     npars <- ncol(X)
