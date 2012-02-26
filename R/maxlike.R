@@ -1,8 +1,10 @@
-maxlike <- function(formula, rasters, points, starts, hessian=TRUE,
+maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
+                    starts, hessian=TRUE,
                     fixed, removeDuplicates=FALSE, na.action="na.omit", ...)
 {
     if(identical(formula, ~1))
         stop("At least one continuous covariate must be specified in the formula")
+    link <- match.arg(link)
     varnames <- all.vars(formula)
     call <- match.call()
     npts <- nrow(points)
@@ -63,11 +65,22 @@ maxlike <- function(formula, rasters, points, starts, hessian=TRUE,
     else
        names(starts) <- parnames
 
-    nll <- function(pars) {
-        psix <- plogis(X %*% pars)
-        psiz <- plogis(Z %*% pars)
-        -1*sum(log(psix/sum(psiz) + .Machine$double.xmin))
+    if(identical(link, "logit")) {
+        nll <- function(pars) {
+            psix <- .Call("logit_linkinv", drop(X %*% pars),
+                          PACKAGE="stats")
+            psiz <- sum(.Call("logit_linkinv", drop(Z %*% pars),
+                              PACKAGE="stats"))
+            -1*sum(log(psix/psiz + .Machine$double.xmin))
         }
+    } else if(identical(link, "cloglog")) {
+        nll <- function(pars) {
+            psix <- 1-exp(-exp(drop(X %*% pars)))
+            psiz <- sum(1-exp(-exp(drop(Z %*% pars))))
+            -1*sum(log(psix/psiz + .Machine$double.xmin))
+        }
+    } else
+        stop("link function should be either 'logit' or 'cloglog'")
 
     is.fixed <- rep(FALSE, npars)
     if(!missing(fixed)) {
@@ -113,7 +126,7 @@ maxlike <- function(formula, rasters, points, starts, hessian=TRUE,
     out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call,
                 pts.removed=pts.removed, pix.removed=pix.removed,
 #                duplicates=duplicates,
-                optim=fm, not.fixed=not.fixed)
+                optim=fm, not.fixed=not.fixed, link=link)
     class(out) <- c("maxlikeFit", "list")
     return(out)
     }

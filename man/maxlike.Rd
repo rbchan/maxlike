@@ -10,8 +10,9 @@
   the entire region of interest.
 }
 \usage{
-  maxlike(formula, rasters, points, starts, hessian = TRUE,
-          fixed, removeDuplicates=FALSE, na.action = "na.omit", ...)
+  maxlike(formula, rasters, points, link=c("logit", "cloglog"),
+          starts, hessian = TRUE, fixed, removeDuplicates=FALSE,
+          na.action = "na.omit", ...)
 }
 \arguments{
   \item{formula}{
@@ -28,6 +29,9 @@
   \item{points}{
     A \code{\link{data.frame}} with the X and Y coordinates of the
     presence locations.
+  }
+  \item{link}{
+    The link function. Either "logit" (the default) or "cloglog".
     }
   \item{starts}{
     Starting values for the parameters. This should be a vector with as
@@ -76,6 +80,7 @@
   \item{optim}{The object returned by \code{\link{optim}}}
   \item{not.fixed}{A logical vector indicating if a parameter was
     estimated or fixed.}
+  \item{link}{The link function}
   }
 \note{
   In general it is very hard to obtain a random sample of presence

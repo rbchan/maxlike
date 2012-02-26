@@ -61,6 +61,7 @@ predict.maxlikeFit <- function(object, rasters, ...) {
             stop("could not find the raster data")
         warning("The raster data was not supplied. Using the data found in the workspace.")
     }
+    link <- object$link
     cd.names <- layerNames(rasters)
     npix <- prod(dim(rasters)[1:2])
     z <- as.data.frame(matrix(getValues(rasters), npix))
@@ -70,8 +71,14 @@ predict.maxlikeFit <- function(object, rasters, ...) {
     if(!all(varnames %in% cd.names))
         stop("at least 1 covariate in the formula is not in rasters.")
     Z.mf <- model.frame(formula, z, na.action="na.pass")
-    Z <- model.matrix(terms(Z.mf), Z.mf)
-    psi.hat <- plogis(Z %*% coef(object))
+    Z <- model.matrix(terms(Z.mf), Z.mf) # Requires R>2.13.0
+    eta <- drop(Z %*% coef(object))
+    if(identical(link, "logit"))
+        psi.hat <- .Call("logit_linkinv", eta, PACKAGE="stats")
+    else if(identical(link, "cloglog"))
+        psi.hat <- 1-exp(-exp(eta))
+    else
+        stop("link function should be either 'logit' or 'cloglog'")
     psi.mat <- matrix(psi.hat, dim(rasters)[1], dim(rasters)[2],
                       byrow=TRUE)
     psi.raster <- raster(psi.mat)
