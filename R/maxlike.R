@@ -1,6 +1,6 @@
 maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
-                    starts, hessian=TRUE,
-                    fixed, removeDuplicates=FALSE, na.action="na.omit", ...)
+                    starts, hessian=TRUE, fixed, removeDuplicates=FALSE,
+                    na.action="na.omit", ...)
 {
     if(identical(formula, ~1))
         stop("At least one continuous covariate must be specified in the formula")
@@ -25,6 +25,7 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
         if(removeDuplicates) {
             cellID <- unique(cellID)
             npts <- length(cellID)
+            points.retained <- points[!duplicates,]
             }
         x <- as.data.frame(matrix(extract(rasters, cellID), npts))
         z <- as.data.frame(matrix(getValues(rasters), npix))
@@ -35,13 +36,16 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
     X.mf <- model.frame(formula, x, na.action=na.action)
     X.mf.a <- attributes(X.mf)
     pts.removed <- integer(0)
+    points.retained <- points
     if("na.action" %in% names(X.mf.a)) {
         pts.removed <- X.mf.a$na.action
         npts.removed <- length(pts.removed)
-        if(npts.removed > 0)
+        if(npts.removed > 0) {
             warning(paste(npts.removed,
                           "points removed due to missing values"))
+            points.retained <- points.retained[-pts.removed,]
         }
+    }
     X <- model.matrix(formula, X.mf)
     Z.mf <- model.frame(formula, z, na.action=na.action)
     Z.mf.a <- attributes(Z.mf)
@@ -125,7 +129,7 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
     fitted <- plogis(Z %*% par)
     out <- list(Est=cbind(Est=par, SE=se), vcov=vc, AIC=aic, call=call,
                 pts.removed=pts.removed, pix.removed=pix.removed,
-#                duplicates=duplicates,
+                points.retained=points.retained,
                 optim=fm, not.fixed=not.fixed, link=link)
     class(out) <- c("maxlikeFit", "list")
     return(out)

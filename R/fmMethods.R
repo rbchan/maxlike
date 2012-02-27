@@ -89,3 +89,30 @@ predict.maxlikeFit <- function(object, rasters, ...) {
 
 
 
+
+chisq.maxlikeFit <- function(object, fact, ...) {
+    if(missing(fact)) {
+        warning("The amount of aggregation (fact) was not specified, so was set to 2. See ?aggregate.")
+        fact <- 2
+    }
+    xy <- object$points.retained
+    E <- predict(object)
+    Ea <- aggregate(E, fact=fact, fun=sum, expand=FALSE)
+    # Need to area of each new pixel
+    Ep <- Ea / cellStats(Ea, sum)
+    if(cellStats(Ep, sum) < 0.99)
+        stop("Error computing cell probabilites")
+    npix <- ncell(Ep)
+    cellID <- cellFromXY(Ep, xy)
+    cellID <- factor(cellID, levels=1:npix)
+    n <- table(cellID)
+    observed <- expected <- Ep
+    values(observed) <- as.numeric(n)
+    values(expected) <- as.numeric(n*values(Ep))
+    rast.stack <- stack(observed, expected)
+    layerNames(rast.stack) <- c("observed", "expected")
+    out <- list(test=chisq.test(n, p=values(Ep), ...),
+                obsexp=rast.stack)
+    return(out)
+}
+
