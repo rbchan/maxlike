@@ -1,0 +1,19 @@
+citHeader("To cite maxlike in publications use:")
+
+citEntry(entry = "Article",
+  title        = "Likelihood analysis of species occurrence probability	from presence-only data for modelling species distributions",
+  author       = personList(as.person("J. Andrew Royle"),
+                   as.person("Richard B. Chandler"),
+                   as.person("Charles Yackulic"),
+                   as.person("James D. Nichols")),
+  journal      = "Methods in Ecology and Evolution",
+  year         = "2012",
+  volume       = "",
+  number       = "",
+  pages        = "",
+  textVersion  =
+  paste("J.A. Royle, R.B. Chandler, C. Yackulic, and J.D. Nichols (2012).",
+        "Likelihood analysis of species occurrence probability
+	from presence-only data for modelling species distributions",
+        "Methods in Ecology and Evolution.")
+)

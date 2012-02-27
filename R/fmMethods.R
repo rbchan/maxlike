@@ -55,7 +55,8 @@ AIC.maxlikeFit <- function(object, ..., k=2) {
 
 predict.maxlikeFit <- function(object, ...) {
     e <- coef(object)
-    if(is.null(object$rasters)) {
+    rasters <- object$rasters
+    if(is.null(rasters)) {
         rasters <- try(get(as.character(object$call$rasters)))
         if(identical(class(rasters)[1],  "try-error"))
             stop("could not find the raster data")
@@ -89,26 +90,41 @@ predict.maxlikeFit <- function(object, ...) {
 
 
 
+chisq <- function(object, ...) UseMethod("chisq")
 
 chisq.maxlikeFit <- function(object, fact, ...) {
     E <- predict(object)
-    if(!missing(fact))
-        E <- aggregate(E, fact=fact, fun=sum, expand=FALSE)
+    if(!missing(fact)) {
+        sum2 <- function(x, na.rm=TRUE) {
+            if(all(is.na(x)))
+                return(NA)
+            else
+                return(sum(x, na.rm=TRUE))
+        }
+        E <- aggregate(E, fact=fact, fun=sum2, expand=FALSE)
+    }
     xy <- object$points.retained
     # Need area of each new pixel
     Ep <- E / cellStats(E, sum)
-    if(cellStats(Ep, sum) < 0.99)
-        stop("Error computing cell probabilites")
     npix <- ncell(Ep)
     cellID <- cellFromXY(Ep, xy)
     cellID <- factor(cellID, levels=1:npix)
     n <- table(cellID)
+    p <- values(Ep)
     observed <- expected <- Ep
     values(observed) <- as.numeric(n)
-    values(expected) <- as.numeric(n*values(Ep))
+    values(expected) <- as.numeric(n*p)
+    observed[is.na(expected)] <- NA
     rast.stack <- stack(observed, expected)
     layerNames(rast.stack) <- c("observed", "expected")
-    out <- list(test=chisq.test(n, p=values(Ep), ...),
+    keep <- !is.na(p)
+    nr <- n[keep]
+    pr <- p[keep]
+    if(any(pr==0)) {
+        warning("Zero probs were converted to .Machine$double.xmin")
+        pr[pr==0] <- .Machine$double.xmin
+}
+    out <- list(test=chisq.test(nr, p=pr, rescale.p=TRUE, ...),
                 obsexp=rast.stack)
     return(out)
 }

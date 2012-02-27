@@ -174,6 +174,8 @@ confint(fm)
 AIC(fm)
 logLik(fm)
 
+# Evaluate model fit using Pearson's chi-squared test
+gof <- chisq(fm)
 
 
 # Produce species distribution map (ie, expected probability of occurrence)
