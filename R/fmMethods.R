@@ -90,9 +90,17 @@ predict.maxlikeFit <- function(object, ...) {
 
 
 
+
+
+
+
+
+
+# Garbage
 chisq <- function(object, ...) UseMethod("chisq")
 
 chisq.maxlikeFit <- function(object, fact, ...) {
+    stop("This is wrong")
     E <- predict(object)
     if(!missing(fact)) {
         sum2 <- function(x, na.rm=TRUE) {
@@ -113,7 +121,7 @@ chisq.maxlikeFit <- function(object, fact, ...) {
     p <- values(Ep)
     observed <- expected <- Ep
     values(observed) <- as.numeric(n)
-    values(expected) <- as.numeric(n*p)
+    values(expected) <- as.numeric(nrow(xy)*p)
     observed[is.na(expected)] <- NA
     rast.stack <- stack(observed, expected)
     layerNames(rast.stack) <- c("observed", "expected")

@@ -1,10 +1,10 @@
 \name{maxlike}
 \alias{maxlike}
 \title{
-  Model probability of occurrence using presence-only data
+  Model occurrence probability using presence-only data
 }
 \description{
-  Model the probability of occurrence from presence-only data
+  Model the probability of occurrence using presence-only data
   (i.e., datasets lacking observed absences) using covariate data
   from a random sample of presence points, and covariate data from
   the entire region of interest.
@@ -12,7 +12,7 @@
 \usage{
   maxlike(formula, rasters, points, link=c("logit", "cloglog"),
           starts, hessian = TRUE, fixed, removeDuplicates=FALSE,
-          na.action = "na.omit", ...)
+          savedata=FALSE, na.action = "na.omit", ...)
 }
 \arguments{
   \item{formula}{
@@ -173,9 +173,6 @@ summary(fm)
 confint(fm)
 AIC(fm)
 logLik(fm)
-
-# Evaluate model fit using Pearson's chi-squared test
-gof <- chisq(fm)
 
 
 # Produce species distribution map (ie, expected probability of occurrence)

@@ -7,4 +7,4 @@ S3method(summary, maxlikeFit)
 S3method(logLik, maxlikeFit)
 S3method(AIC, maxlikeFit)
 S3method(predict, maxlikeFit)
-S3method(chisq, maxlikeFit)
+
