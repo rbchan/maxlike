@@ -1,6 +1,6 @@
 maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
                     starts, hessian=TRUE, fixed, removeDuplicates=FALSE,
-                    na.action="na.omit", ...)
+                    savedata=FALSE, na.action="na.omit", ...)
 {
     if(identical(formula, ~1))
         stop("At least one continuous covariate must be specified in the formula")
@@ -131,6 +131,8 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
                 pts.removed=pts.removed, pix.removed=pix.removed,
                 points.retained=points.retained,
                 optim=fm, not.fixed=not.fixed, link=link)
+    if(savedata)
+        out$rasters <- rasters
     class(out) <- c("maxlikeFit", "list")
     return(out)
     }

@@ -53,13 +53,13 @@ AIC.maxlikeFit <- function(object, ..., k=2) {
 
 
 
-predict.maxlikeFit <- function(object, rasters, ...) {
+predict.maxlikeFit <- function(object, ...) {
     e <- coef(object)
-    if(missing(rasters)) {
+    if(is.null(object$rasters)) {
         rasters <- try(get(as.character(object$call$rasters)))
         if(identical(class(rasters)[1],  "try-error"))
             stop("could not find the raster data")
-        warning("The raster data were not supplied, using the data found in the workspace instead.")
+        warning("raster data were not saved with object, using the data found in the workspace instead.")
     }
     link <- object$link
     cd.names <- layerNames(rasters)
@@ -91,15 +91,12 @@ predict.maxlikeFit <- function(object, rasters, ...) {
 
 
 chisq.maxlikeFit <- function(object, fact, ...) {
-    if(missing(fact)) {
-        warning("The amount of aggregation (fact) was not specified, so was set to 2. See ?aggregate.")
-        fact <- 2
-    }
-    xy <- object$points.retained
     E <- predict(object)
-    Ea <- aggregate(E, fact=fact, fun=sum, expand=FALSE)
-    # Need to area of each new pixel
-    Ep <- Ea / cellStats(Ea, sum)
+    if(!missing(fact))
+        E <- aggregate(E, fact=fact, fun=sum, expand=FALSE)
+    xy <- object$points.retained
+    # Need area of each new pixel
+    Ep <- E / cellStats(E, sum)
     if(cellStats(Ep, sum) < 0.99)
         stop("Error computing cell probabilites")
     npix <- ncell(Ep)

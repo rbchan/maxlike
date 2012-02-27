@@ -53,7 +53,15 @@
     Logical. Should duplicate points be removed. Defaults to FALSE, but
     note that the MAXENT default is TRUE. It is unclear why duplicate
     points should be removed, but this option is provided for
-    comparative purposes.}
+    comparative purposes.
+  }
+  \item{savedata}{
+    Should the raster data be saved with the fitted model? Defaults to
+    FALSE in order to reduce the size of the returned object. If you
+    wish to make predictions, it is safer to set this to TRUE, otherwise
+    the raster data are searched for in the working directory, and thus
+    may not be the data used to fit the model.
+  }
   \item{na.action}{
     See \code{\link{options}} for choices
   }
@@ -159,7 +167,7 @@ plot(rs)
 fm <- maxlike(~pcMix + I(pcMix^2) + pcDec + I(pcDec^2)+ pcCon +
     I(pcCon^2) + pcGr + I(pcGr^2) +
     Lat + I(Lat^2) + Lon + I(Lon^2), rs, carw.data$xy1,
-    method="BFGS", removeDuplicates=TRUE)
+    method="BFGS", removeDuplicates=TRUE, savedata=TRUE)
 
 summary(fm)
 confint(fm)
@@ -169,15 +177,15 @@ logLik(fm)
 
 
 # Produce species distribution map (ie, expected probability of occurrence)
-psi.hat <- predict(fm, rs)
+psi.hat <- predict(fm) # Will warn if savedata=FALSE
 plot(psi.hat)
 points(carw.data$xy1, pch=16, cex=0.1)
 
 
 
-# MAXENT sets "default prevalence" to an arbitrary value, 0.5
-# We could do the same by fixing the intercept at logit(0.5)=0
-# However, it seems more appropriate to estimate this parameter
+# MAXENT sets "default prevalence" to an arbitrary value, 0.5.
+# We could do something similar by fixing the intercept at logit(0.5)=0.
+# However, it seems more appropriate to estimate this parameter.
 
 fm.fix <- update(fm, fixed=c(0, rep(NA,length(coef(fm))-1)))
 

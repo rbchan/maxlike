@@ -1,0 +1,14 @@
+maxlike_0.1-2
+
+o  Added link argument allowing for new cloglog link function
+o  Added chisq function to assess model fit
+o  Added savedata argument
+o  New unit tests
+
+
+maxlike_0.1-1
+
+o  Added predict method
+o  Added fixed argument to fix parameters
+o  Added option to removeDuplicates, as MAXENT does by default
+
