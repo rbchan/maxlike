@@ -13,8 +13,8 @@
   locations and environmental data for the study area. MAXENT is a
   popular software program for modeling species distributions, but it does
   not estimate the probability of occurrence. Rather, it returns various
-  indices that are not easy to interpret (see Royle et al. In
-  Press). Package "maxlike" provides a simple
+  indices that are not easy to interpret (see Royle et
+  al. 2012). Package "maxlike" provides a simple
   likelihood-based alternative.
 }
 \note{
@@ -31,7 +31,7 @@
 Package: \tab maxlike\cr
 Type: \tab Package\cr
 Version: \tab 0.1-1\cr
-Date: \tab 2012-02-17\cr
+Date: \tab 2012-02-27\cr
 License: \tab GPL (>=3) \cr
 LazyLoad: \tab yes\cr
 }

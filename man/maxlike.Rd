@@ -4,10 +4,11 @@
   Model occurrence probability using presence-only data
 }
 \description{
-  Model the probability of occurrence using presence-only data
-  (i.e., datasets lacking observed absences) using covariate data
-  from a random sample of presence points, and covariate data from
-  the entire region of interest.
+  This function estimates the probability of occurrence using so-called
+  presence-only data and spatially-referenced covariates. Species
+  distribution maps can be created by plotting the
+  expected values of occurrence probability.  The model is described by
+  Royle et al. (2012).
 }
 \usage{
   maxlike(formula, rasters, points, link=c("logit", "cloglog"),
@@ -20,15 +21,16 @@
     At least 1 continuous covariate must be present in the formula.
     }
   \item{rasters}{
-    A `raster stack' created by the \code{\link{stack}} function
+    The spatially-referenced covariate data formatted as a `raster
+    stack' created by the \code{\link{stack}} function
     in the \code{\link{raster-package}}. It's a good idea to standardize
     these by subtracting the mean and dividing by the standard
     deviation. This will make it easier for \code{\link{optim}} to find
     the maximum-likelihood estimates.
     }
   \item{points}{
-    A \code{\link{data.frame}} with the X and Y coordinates of the
-    presence locations.
+    A \code{\link{matrix}} or \code{\link{data.frame}} with the X and Y
+    coordinates of the presence locations.
   }
   \item{link}{
     The link function. Either "logit" (the default) or "cloglog".
@@ -39,18 +41,18 @@
     values are 0, which should be adequate if covariates are standardized.
     }
   \item{hessian}{
-    Logical. Should the hessian be computed and the variance-covariance matrix
-    returned?
+    Logical. Should the hessian be computed and the variance-covariance
+    matrix returned?
     }
   \item{fixed}{
     Optional vector for fixing parameters. It must be
     of length equal to the number of parameters in the
-    model. If an element of fixed is NA, then the parameter is
+    model. If an element of \code{fixed} is NA, then the parameter is
     estimated, otherwise if it is a real number, the parameter is fixed
     at this value.
     }
   \item{removeDuplicates}{
-    Logical. Should duplicate points be removed. Defaults to FALSE, but
+    Logical. Should duplicate points be removed? Defaults to FALSE, but
     note that the MAXENT default is TRUE. It is unclear why duplicate
     points should be removed, but this option is provided for
     comparative purposes.
@@ -70,10 +72,8 @@
     }
 }
 \details{
-  Covariate data for the entire region of interest are contained in \code{rasters}.
-  Data from the presence locations are extracted using the
-  coordinates in \code{points}. Rasters and points
-  should both use the same coordinate system. The program does not check
+  \code{points} and \code{rasters}
+  should the same coordinate system. The program does not check
   this so it is up to the user.
   }
 \value{
@@ -94,11 +94,11 @@
   In general it is very hard to obtain a random sample of presence
   points, which is a requirement of both the Royle et al. (2012)
   method and of MAXENT. This is one of many reasons why presence-absence
-  data are preferable. When presence-absence data are available, they
-  can be modeled using functions such as
-  \code{\link[stats]{glm}}. Creating
-  maps of prediction from \code{\link[stats]{glm}} is easily
-  accomplished.
+  data are preferable to presence-only data. When presence-absence data
+  are available, they can be modeled using functions such as
+  \code{\link[stats]{glm}}. Creating species distribution maps
+  from \code{\link[stats]{glm}} is easily accomplished using the
+  \code{\link[stats]{predict}} method.
 
   The MAXENT software assumes that species prevalence is known a
   priori. If the user does not specify a value for prevalence,
@@ -115,12 +115,12 @@
   when detection/non-detection data are available.
 }
 
-\section{Warning}{
+\section{Warnings}{
   Maximizing the log-likelihood function is achieved using the
   \code{\link{optim}} function, which can fail to find the global optima
   if sensible starting values are not
-  supplied. The default starting values are \code{rep(0, npars)}, which will
-  often be adequate if the covariates have been
+  supplied. The default starting values are \code{rep(0, npars)}, which
+  will often be adequate if the covariates have been
   standardized. Standardizing covariates is thus recommended.
   Even when covariates are standardized, it is always a good idea to try
   various starting values to see if the

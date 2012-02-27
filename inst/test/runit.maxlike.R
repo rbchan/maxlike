@@ -61,13 +61,18 @@ test.maxlike.fit1 <- function() {
                        tol=1e-6)
 
     # Test cloglog
-    fm4 <- update(fm2, link="cloglog")
+    fm4 <- update(fm2, link="cloglog", savedata=TRUE)
     checkEqualsNumeric(coef(fm4),
                        c(0.1765974, 2.0890600, -2.0136279,  1.7778590),
                        tol=1e-6)
 
-    psi.hat <- predict(fm2)
+    # Test predict
+    fm5 <- update(fm2, savedata=TRUE)
+    psi.hat <- predict(fm5)
     checkEqualsNumeric(cellStats(psi.hat), 0.3538176, tol=1e-6)
+
+    psi.hat <- predict(fm4)
+    checkEqualsNumeric(cellStats(psi.hat), 0.3817011, tol=1e-6)
 
 }
 
