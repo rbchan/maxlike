@@ -18,7 +18,7 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
         stop("points must have 2 columns containing the x- and y- coordinates")
     pt.names <- colnames(points)
     if(identical(cd.class, "RasterStack")) {
-        cd.names <- layerNames(rasters)
+        cd.names <- names(rasters)
         npix <- prod(dim(rasters)[1:2])
         cellID <- cellFromXY(rasters, points)
         duplicates <- duplicated(cellID)
