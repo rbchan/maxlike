@@ -1,4 +1,3 @@
-
 # S3 methods
 
 print.maxlikeFit <- function(x, ...) {
@@ -63,7 +62,7 @@ predict.maxlikeFit <- function(object, ...) {
         warning("raster data were not saved with object, using the data found in the workspace instead.")
     }
     link <- object$link
-    cd.names <- layerNames(rasters)
+    cd.names <- names(rasters)
     npix <- prod(dim(rasters)[1:2])
     z <- as.data.frame(matrix(getValues(rasters), npix))
     names(z) <- cd.names
