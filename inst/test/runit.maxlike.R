@@ -7,7 +7,7 @@ test.maxlike.fit1 <- function() {
 
     # Stack them and make sure they are named
     ep <- stack(elev, precip)
-    layerNames(ep) <- c("elev", "precip")
+    names(ep) <- c("elev", "precip")
 
     # Fit a model
     fm <- maxlike(~elev + I(elev^2) + precip, ep, xy)
@@ -31,7 +31,7 @@ test.maxlike.fit1 <- function() {
     xy2 <- xy
     xy2[2,] <- NA
     ep2 <- stack(elev2, precip)
-    layerNames(ep2) <- c("elev", "precip")
+    names(ep2) <- c("elev", "precip")
     fm2 <- maxlike(~elev + I(elev^2) + precip, ep2, xy2)
     checkEqualsNumeric(fm2$pix.removed, c(1,5))
     checkEqualsNumeric(fm2$pts.removed, 2)
@@ -69,10 +69,10 @@ test.maxlike.fit1 <- function() {
     # Test predict
     fm5 <- update(fm2, savedata=TRUE)
     psi.hat <- predict(fm5)
-    checkEqualsNumeric(cellStats(psi.hat), 0.3538176, tol=1e-6)
+    checkEqualsNumeric(cellStats(psi.hat, "mean"), 0.3538176, tol=1e-6)
 
     psi.hat <- predict(fm4)
-    checkEqualsNumeric(cellStats(psi.hat), 0.3817011, tol=1e-6)
+    checkEqualsNumeric(cellStats(psi.hat, "mean"), 0.3817011, tol=1e-6)
 
 }
 

@@ -75,7 +75,7 @@ predict.maxlikeFit <- function(object, ...) {
     Z <- model.matrix(Z.terms, Z.mf)
     eta <- drop(Z %*% coef(object))
     if(identical(link, "logit"))
-        psi.hat <- .Call("logit_linkinv", eta, PACKAGE="stats")
+        psi.hat <- plogis(eta)
     else if(identical(link, "cloglog"))
         psi.hat <- 1-exp(-exp(eta))
     else

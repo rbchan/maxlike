@@ -4,7 +4,7 @@
   Model occurrence probability using presence-only data
 }
 \description{
-  This function estimates the probability of occurrence using so-called
+  This function estimates the probability of occurrence using
   presence-only data and spatially-referenced covariates. Species
   distribution maps can be created by plotting the
   expected values of occurrence probability.  The model is described by
@@ -53,9 +53,7 @@
     }
   \item{removeDuplicates}{
     Logical. Should duplicate points be removed? Defaults to FALSE, but
-    note that the MAXENT default is TRUE. It is unclear why duplicate
-    points should be removed, but this option is provided for
-    comparative purposes.
+    note that the MAXENT default is TRUE.
   }
   \item{savedata}{
     Should the raster data be saved with the fitted model? Defaults to
@@ -102,8 +100,9 @@
 
   The MAXENT software assumes that species prevalence is known a
   priori. If the user does not specify a value for prevalence,
-  prevalence is set to 0.5. MAXENT predictions are highly sensitive to
-  this setting. In contrast, \code{maxlike} directly estimates prevalence.
+  prevalence is set to 0.5. MAXENT predictions of occurrence probability
+  are highly sensitive to this setting. In contrast, \code{maxlike}
+  directly estimates prevalence.
 
   Another weakness of models for presence-only data is that they do not
   allow one to model detection probability, which is typically less than
@@ -212,7 +211,7 @@ psi <- exp(logit.psi)/(1+exp(logit.psi))
 plot(psi)
 
 r <- stack(x1, x2, x3)
-r@layernames <- c("x1", "x2", "x3")
+names(r) <- c("x1", "x2", "x3")
 plot(r)
 
 pa <- matrix(NA, 100, 100)

@@ -71,17 +71,15 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
 
     if(identical(link, "logit")) {
         nll <- function(pars) {
-            psix <- .Call("logit_linkinv", drop(X %*% pars),
-                          PACKAGE="stats")
-            psiz <- sum(.Call("logit_linkinv", drop(Z %*% pars),
-                              PACKAGE="stats"))
-            -1*sum(log(psix/psiz + .Machine$double.xmin))
+            psix <- plogis(drop(X %*% pars))
+            psiz <- sum(plogis(drop(Z %*% pars)))
+            -1*sum(log(psix/psiz)) # + .Machine$double.xmin))
         }
     } else if(identical(link, "cloglog")) {
         nll <- function(pars) {
             psix <- 1-exp(-exp(drop(X %*% pars)))
             psiz <- sum(1-exp(-exp(drop(Z %*% pars))))
-            -1*sum(log(psix/psiz + .Machine$double.xmin))
+            -1*sum(log(psix/psiz)) # + .Machine$double.xmin))
         }
     } else
         stop("link function should be either 'logit' or 'cloglog'")
