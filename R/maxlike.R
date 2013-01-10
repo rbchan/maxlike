@@ -88,7 +88,7 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
     if(!missing(fixed)) {
         if(length(fixed) != length(starts))
             stop("fixed should be a vector with the same length as the number of parameters to be estimated")
-        if(sum(is.real(fixed)) < 1)
+        if(sum(is.double(fixed)) < 1)
             stop("fixed must contain at least one real value")
         is.fixed <- !is.na(fixed)
         if(sum(!is.fixed) < 1)
