@@ -32,7 +32,7 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
         names(x) <- names(z) <- cd.names
         }
     if(!all(varnames %in% cd.names))
-        stop("at least 1 covariate in the formula is not in layerNames(rasters).")
+        stop("at least 1 covariate in the formula is not in names(rasters).")
     X.mf <- model.frame(formula, x, na.action=na.action)
     X.mf.a <- attributes(X.mf)
     pts.removed <- integer(0)

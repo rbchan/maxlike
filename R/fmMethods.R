@@ -123,7 +123,7 @@ chisq.maxlikeFit <- function(object, fact, ...) {
     values(expected) <- as.numeric(nrow(xy)*p)
     observed[is.na(expected)] <- NA
     rast.stack <- stack(observed, expected)
-    layerNames(rast.stack) <- c("observed", "expected")
+    names(rast.stack) <- c("observed", "expected")
     keep <- !is.na(p)
     nr <- n[keep]
     pr <- p[keep]

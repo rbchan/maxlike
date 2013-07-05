@@ -2,8 +2,8 @@ Package: maxlike
 Type: Package
 Title: Model species distributions by estimating the probability of occurrence
   using presence-only data.
-Version: 0.1-3
-Date: 2013-01-10
+Version: 0.1-4
+Date: 2013-07-05
 Depends: R (>= 2.10.0), raster
 Author: Richard Chandler and Andy Royle
 Maintainer: Richard Chandler <rchandler@usgs.gov>

@@ -56,7 +56,7 @@ rl <- lapply(carw.data$raster.data, function(x) {
 
 # Stack and name them
 rs <- stack(rl[[1]], rl[[2]], rl[[3]], rl[[4]], rl[[5]], rl[[6]])
-layerNames(rs) <- names(carw.data$raster.data)
+names(rs) <- names(carw.data$raster.data)
 
 plot(rs)
 
