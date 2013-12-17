@@ -30,8 +30,8 @@
 \tabular{ll}{
 Package: \tab maxlike\cr
 Type: \tab Package\cr
-Version: \tab 0.1-3\cr
-Date: \tab 2013-10-10\cr
+Version: \tab 0.1-5\cr
+Date: \tab 2013-12-17\cr
 License: \tab GPL (>=3) \cr
 LazyLoad: \tab yes\cr
 }
@@ -40,7 +40,7 @@ LazyLoad: \tab yes\cr
   J. A. Royle, R. B. Chandler, C. Yackulic and J.
   D. Nichols. 2012. Likelihood analysis of species occurrence probability
   from presence-only data for modelling species distributions. Methods
-  in Ecology and Evolution. doi: 10.1111/j.2041-210X.2011.00182.x.
+  in Ecology and Evolution 3:545--554. doi: 10.1111/j.2041-210X.2011.00182.x.
 }
 
 \seealso{ \code{\link{maxlike}}, \code{\link{raster}} }
