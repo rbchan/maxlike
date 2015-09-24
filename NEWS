@@ -1,4 +1,4 @@
-maxlike_0.1-5
+maxlike_0.1-6
 
 o  Make predict.maxlike work with formulas build from strings with as.formula.
 
