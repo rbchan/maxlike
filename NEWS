@@ -1,3 +1,7 @@
+maxlike_0.1-5
+
+o  Make predict.maxlike work with formulas build from strings with as.formula.
+
 maxlike_0.1-4
 
 o  Fixed bug caused by deprication of layerNames() in raster package... again.
