@@ -7,6 +7,7 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
     link <- match.arg(link)
     varnames <- all.vars(formula)
     call <- match.call()
+    call$formula <- formula ## set call$formula to formula value otherwise predict can't access the formula
     npts <- nrow(points)
     cd.class <- class(rasters)[1]
     if(cd.class != "RasterStack")
@@ -133,7 +134,7 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
         out$rasters <- rasters
     class(out) <- c("maxlikeFit", "list")
     return(out)
-    }
+}
 
 
 

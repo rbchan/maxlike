@@ -2,3 +2,5 @@
 .git//
 ./.git//
 README
+^.*\.Rproj$
+^\.Rproj\.user$

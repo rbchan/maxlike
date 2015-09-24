@@ -11,7 +11,7 @@ test.maxlike.fit1 <- function() {
 
     # Fit a model
     fm <- maxlike(~elev + I(elev^2) + precip, ep, xy)
-
+    
     # Check estimates
     checkEqualsNumeric(coef(fm),
                        c(0.5366934, 2.4465578, -2.3575862, 2.1310296),
@@ -44,7 +44,7 @@ test.maxlike.fit1 <- function() {
                                 -2.73433869, -1.987336,
                                 1.71726661,  2.558565),
                        4, 2, byrow=TRUE), tol=1e-6)
-
+    
     # Test update
     fm2u <- update(fm2)
     checkEquals(fm2, fm2u)
@@ -73,7 +73,12 @@ test.maxlike.fit1 <- function() {
 
     psi.hat <- predict(fm4)
     checkEqualsNumeric(cellStats(psi.hat, "mean"), 0.3817011, tol=1e-6)
-
+    
+    # Fit a "dynamic" formula
+    formula <- as.formula("~elev + I(elev^2) + precip")
+    fm6 <- maxlike(formula, rasters = ep, points = xy, savedata = T)
+    psi.hat <- predict(fm6)
+    checkEqualsNumeric(cellStats(psi.hat, "mean"), 0.3527259, tol=1e-6)
 }
 
 
