@@ -11,7 +11,8 @@
   Royle et al. (2012).
 }
 \usage{
-  maxlike(formula, rasters, points, link=c("logit", "cloglog"),
+  maxlike(formula, rasters, points, x=NULL, z=NULL,
+          link=c("logit", "cloglog"),
           starts, hessian = TRUE, fixed, removeDuplicates=FALSE,
           savedata=FALSE, na.action = "na.omit", ...)
 }
@@ -31,6 +32,16 @@
   \item{points}{
     A \code{\link{matrix}} or \code{\link{data.frame}} with the X and Y
     coordinates of the presence locations.
+  }
+  \item{x}{
+    A \code{\link{matrix}} or \code{\link{data.frame}} with the explanatory
+    data for presence locations. In case data is provided for \code{x}
+    and \code{z}, arguments \code{rasters} and \code{points} will be ignored
+  }
+  \item{z}{
+    A \code{\link{matrix}} or \code{\link{data.frame}} with the explanatory
+    data for background locations. In case data is provided for \code{x}
+    and \code{z}, arguments \code{rasters} and \code{points} will be ignored
   }
   \item{link}{
     The link function. Either "logit" (the default) or "cloglog".
@@ -187,7 +198,31 @@ points(carw.data$xy1, pch=16, cex=0.1)
 
 fm.fix <- update(fm, fixed=c(0, rep(NA,length(coef(fm))-1)))
 
+# Predict data.frame
+presenceData <- as.data.frame(extract(rs, carw.data$xy1))
+presenceData <- presenceData[complete.cases(presenceData), ]
+presence.predictions <- predict(fm, newdata=presenceData)
+summary(presence.predictions)
 
+# Calibrate with data.frames
+PresenceUniqueCells <- unique(cellFromXY(rs, xy=carw.data$xy1))
+PresenceUnique <- xyFromCell(rs, PresenceUniqueCells)
+presenceData <- as.data.frame(extract(rs, PresenceUnique))
+library(dismo)
+background <- randomPoints(rs, n=ncell(rs), extf=1.00)
+backgroundData <- as.data.frame(extract(rs, y=background))
+backgroundData <- backgroundData[complete.cases(backgroundData), ]
+fm2 <- maxlike(~pcMix + I(pcMix^2) + pcDec + I(pcDec^2)+ pcCon +
+    I(pcCon^2) + pcGr + I(pcGr^2) +
+    Lat + I(Lat^2) + Lon + I(Lon^2), 
+    rasters=NULL, points=NULL,
+    x=presenceData, z=backgroundData,
+    method="BFGS", removeDuplicates=TRUE, savedata=TRUE)
+
+summary(fm2)
+
+fm2$rasters <- rs
+psi.hat2 <- predict(fm2)
 
 
 

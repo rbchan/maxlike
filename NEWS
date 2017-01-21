@@ -1,3 +1,13 @@
+maxlike_0.1-7
+
+o  Allow maxlike to be calibrated with data.frames via arguments 
+   x (data.frame with environmental conditions at presence point
+   locations) and z (data.frame with environmental conditions at
+   background locations).
+
+o  New argument for function predict.maxlikeFit of newdata,
+   allowing predictions from data.frames and via raster::predict  
+
 maxlike_0.1-6
 
 o  Make predict.maxlike work with formulas build from strings with as.formula.

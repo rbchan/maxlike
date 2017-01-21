@@ -1,4 +1,5 @@
-maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
+maxlike <- function(formula, rasters, points, x=NULL, z=NULL,
+                    link=c("logit", "cloglog"),
                     starts, hessian=TRUE, fixed, removeDuplicates=FALSE,
                     savedata=FALSE, na.action="na.omit", ...)
 {
@@ -7,18 +8,32 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
     link <- match.arg(link)
     varnames <- all.vars(formula)
     call <- match.call()
-    call$formula <- formula ## set call$formula to formula value otherwise predict can't access the formula
-    npts <- nrow(points)
-    cd.class <- class(rasters)[1]
-    if(cd.class != "RasterStack")
+# allow for as.formula objects (Roeland Kindt)
+    call$formula <- eval(formula)
+
+# allow for data.frames as input (Roeland Kindt)
+
+    if (is.null(x)==F && is.null(z)==F) {
+        x <- as.data.frame(x)
+        z <- as.data.frame(z)
+        cd.names <- names(x)
+        if (identical(names(x), names(z)) == F) {stop("x and z should have same names")} 
+        X.mf <- model.frame(formula, x, na.action=na.action)
+        X <- model.matrix(formula, X.mf)
+        Z.mf <- model.frame(formula, z, na.action=na.action)
+        Z <- model.matrix(formula, Z.mf)
+        pts.removed <- pix.removed <- points.retained <- NULL 
+    }else{
+        npts <- nrow(points)
+        cd.class <- class(rasters)[1]
+        if(cd.class != "RasterStack")
         stop("rasters must be a raster stack")
-    pt.class <- class(points)[1]
-    if(!pt.class %in% c("matrix", "data.frame"))
-        stop("points must be a matrix or a data.frame")
-    if(ncol(points) != 2)
-        stop("points must have 2 columns containing the x- and y- coordinates")
-    pt.names <- colnames(points)
-    if(identical(cd.class, "RasterStack")) {
+        pt.class <- class(points)[1]
+        if(!pt.class %in% c("matrix", "data.frame"))
+            stop("points must be a matrix or a data.frame")
+        if(ncol(points) != 2)
+            stop("points must have 2 columns containing the x- and y- coordinates")
+        pt.names <- colnames(points)
         cd.names <- names(rasters)
         npix <- prod(dim(rasters)[1:2])
         cellID <- cellFromXY(rasters, points)
@@ -31,34 +46,34 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
         x <- as.data.frame(matrix(extract(rasters, cellID), npts))
         z <- as.data.frame(matrix(getValues(rasters), npix))
         names(x) <- names(z) <- cd.names
+        if(!all(varnames %in% cd.names))
+            stop("at least 1 covariate in the formula is not in names(rasters).")
+        X.mf <- model.frame(formula, x, na.action=na.action)
+        X.mf.a <- attributes(X.mf)
+        pts.removed <- integer(0)
+        points.retained <- points
+        if("na.action" %in% names(X.mf.a)) {
+            pts.removed <- X.mf.a$na.action
+            npts.removed <- length(pts.removed)
+            if(npts.removed > 0) {
+                warning(paste(npts.removed,
+                              "points removed due to missing values"))
+                points.retained <- points.retained[-pts.removed,]
+            }
         }
-    if(!all(varnames %in% cd.names))
-        stop("at least 1 covariate in the formula is not in names(rasters).")
-    X.mf <- model.frame(formula, x, na.action=na.action)
-    X.mf.a <- attributes(X.mf)
-    pts.removed <- integer(0)
-    points.retained <- points
-    if("na.action" %in% names(X.mf.a)) {
-        pts.removed <- X.mf.a$na.action
-        npts.removed <- length(pts.removed)
-        if(npts.removed > 0) {
-            warning(paste(npts.removed,
-                          "points removed due to missing values"))
-            points.retained <- points.retained[-pts.removed,]
-        }
+        X <- model.matrix(formula, X.mf)
+        Z.mf <- model.frame(formula, z, na.action=na.action)
+        Z.mf.a <- attributes(Z.mf)
+        pix.removed <- integer(0)
+        if("na.action" %in% names(Z.mf.a)) {
+            pix.removed <- Z.mf.a$na.action
+            npix.removed <- length(pix.removed)
+#           if(npix.removed > 0)
+#                warning(paste(npix.removed,
+#                              "pixels removed due to missing values"))
+            }
+        Z <- model.matrix(formula, Z.mf)
     }
-    X <- model.matrix(formula, X.mf)
-    Z.mf <- model.frame(formula, z, na.action=na.action)
-    Z.mf.a <- attributes(Z.mf)
-    pix.removed <- integer(0)
-    if("na.action" %in% names(Z.mf.a)) {
-        pix.removed <- Z.mf.a$na.action
-        npix.removed <- length(pix.removed)
-#        if(npix.removed > 0)
-#            warning(paste(npix.removed,
-#                          "pixels removed due to missing values"))
-        }
-    Z <- model.matrix(formula, Z.mf)
     npars <- ncol(X)
     parnames <- colnames(X)
     if(!"(Intercept)" %in% parnames)
@@ -132,9 +147,10 @@ maxlike <- function(formula, rasters, points, link=c("logit", "cloglog"),
                 optim=fm, not.fixed=not.fixed, link=link)
     if(savedata)
         out$rasters <- rasters
+        out$x <- x
+        out$z <- z
     class(out) <- c("maxlikeFit", "list")
     return(out)
-}
-
+    }
 
 
