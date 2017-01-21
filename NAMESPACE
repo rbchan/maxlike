@@ -1,3 +1,4 @@
+import(stats, raster)
 export("maxlike")
 
 S3method(print, maxlikeFit)
