@@ -25,6 +25,35 @@ test.maxlike.fit1 <- function() {
                        0.03561091,  0.03307982, -0.03398646,  0.04569138),
                        4, 4, byrow=TRUE), tol=1e-6)
 
+    # Check calibration with data.frames (Roeland Kindt)
+
+    # dismo required for randomPoints
+    if(require("dismo", quietly = TRUE)) {
+
+        presenceData <- as.data.frame(extract(ep, xy))
+        background <- randomPoints(ep, n=ncell(ep), extf=1.00)
+        backgroundData <- as.data.frame(extract(ep, y=background))
+        #  backgroundData <- backgroundData[complete.cases(backgroundData), ]
+
+        # Fit a model
+        fm.data <- maxlike(~elev + I(elev^2) + precip, rasters=NULL, points=NULL, 
+            x=presenceData, z=backgroundData)
+    
+        # Check estimates
+        checkEqualsNumeric(coef(fm.data),
+                       c(0.5366934, 2.4465578, -2.3575862, 2.1310296),
+                       tol=1e-6)
+
+        # Check variance-covariance matrix
+        checkEqualsNumeric(vcov(fm.data), matrix(c(
+                       0.05204765,  0.03300724, -0.03589617,  0.03561091,
+                       0.03300724,  0.03921600, -0.03373490,  0.03307982,
+                       -0.03589617, -0.03373490, 0.03618861, -0.03398646,
+                       0.03561091,  0.03307982, -0.03398646,  0.04569138),
+                       4, 4, byrow=TRUE), tol=1e-6)
+    }
+
+
     # Add missing values and refit
     elev2 <- elev
     elev2[c(1,5)] <- NA
