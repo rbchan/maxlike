@@ -74,7 +74,8 @@ predict.maxlikeFit <- function(object, newdata=NULL, ...) {
     formula <- object$call$formula
     varnames <- all.vars(formula)
 # reversed cd.names and varnames to allow for polynomials etc via I(), Roeland Kindt
-    if(!all(cd.names %in% varnames)) {
+# when interaction terms are not the problem but there are unused predictors then it should also work, Samuel Bosch
+    if(!all(cd.names %in% varnames) && !all(varnames %in% cd.names)) {
         if (is.null(newdata) == F) {
             stop("at least 1 covariate in the formula is not in new data")
         }else{
