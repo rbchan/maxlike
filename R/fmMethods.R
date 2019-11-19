@@ -52,10 +52,19 @@ AIC.maxlikeFit <- function(object, ..., k=2) {
 
 predict.maxlikeFit <- function(object, newdata=NULL, ...) {
     e <- coef(object)
-
+ 
 # allowing for data.frames (Roeland Kindt)
     if (is.null(newdata) == F) {
-        z <- newdata
+# allowing for new RasterStack (Roeland Kindt, Nov 2019)
+        if ("RasterStack" %in% class(newdata)) {
+            rasters <- newdata
+            cd.names <- names(newdata)
+            npix <- prod(dim(newdata)[1:2])
+            z <- as.data.frame(matrix(getValues(newdata), npix))
+            names(z) <- cd.names
+        }else{
+            z <- newdata
+        }
         cd.names <- names(z)
     }else{
         rasters <- object$rasters
@@ -74,7 +83,9 @@ predict.maxlikeFit <- function(object, newdata=NULL, ...) {
     formula <- object$call$formula
     varnames <- all.vars(formula)
 # reversed cd.names and varnames to allow for polynomials etc via I(), Roeland Kindt
-    if(!all(cd.names %in% varnames)) {
+# re-reversed...
+#    if(!all(cd.names %in% varnames)) {
+    if(!all(varnames %in% cd.names)) {
         if (is.null(newdata) == F) {
             stop("at least 1 covariate in the formula is not in new data")
         }else{
@@ -92,7 +103,8 @@ predict.maxlikeFit <- function(object, newdata=NULL, ...) {
         psi.hat <- 1-exp(-exp(eta))
     else
         stop("link function should be either 'logit' or 'cloglog'")
-    if (is.null(newdata) == F) {    
+# Corrected Roeland Kindt, Nov 2019
+    if (is.null(newdata) == F  && ("RasterStack" %in% class(newdata)) == F) {    
         return(psi.hat)
     }else{
         psi.mat <- matrix(psi.hat, dim(rasters)[1], dim(rasters)[2], byrow=TRUE)
@@ -101,4 +113,5 @@ predict.maxlikeFit <- function(object, newdata=NULL, ...) {
         return(psi.raster)
     }
 }
+ 
 
